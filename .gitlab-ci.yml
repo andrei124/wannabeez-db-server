@@ -5,11 +5,9 @@ stages:
  
  job build:
   stage: build
-  script: 
-    - mvn compile
+  script: mvn compile
 
 
  job test:
  stage: test
- script:
-    - mvn test
+ script: mvn test
