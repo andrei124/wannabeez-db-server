@@ -1,7 +1,7 @@
 import org.postgis.PGgeometry;
 
 import java.io.*;
-import java.net.MalformedURLException;
+import java.security.KeyStore;
 import java.sql.*;
 import java.util.*;
 
@@ -12,7 +12,7 @@ public class QueryProcessor {
   private Properties properties;
   private Connection connection;
 
-  public QueryProcessor() throws ClassNotFoundException, IOException {
+  public QueryProcessor() throws IOException {
     /* Do not connect by default upon creation */
     connection = null;
 
@@ -26,7 +26,7 @@ public class QueryProcessor {
     registerDriver(driver);
   }
 
-  private void registerDriver(String driver) throws ClassNotFoundException {
+  private void registerDriver(String driver) {
     try {
       Class.forName(driver);
       System.out.println("Database driver loaded succesfully");
@@ -68,7 +68,7 @@ public class QueryProcessor {
  *
   */
 
-  public int insertInto (String tableName, String... values) throws SQLException, MalformedURLException {
+  public int insertInto (String tableName, String... values) throws SQLException {
     PreparedStatement stmt = null;
     tableName = tableName.toUpperCase();
     List<String> args = Arrays.asList(values);
@@ -126,9 +126,30 @@ public class QueryProcessor {
 
     if(tableExists) {
       index = stmt.executeUpdate();
+      stmt.close();
     }
 
     return index;
+  }
+
+
+  public ResultSet selectFrom(String tableName, String... columns) throws SQLException {
+    PreparedStatement stmt = connection.prepareStatement("SELECT ? FROM ?");
+
+    List<String> args = Arrays.asList(columns);
+    int len = args.size();
+
+    StringBuilder sb = new StringBuilder();
+    for(int i = 0; i < len; i++) {
+      if(i != len - 1) {
+        sb.append(args.get(i)).append(",");
+      } else {
+        sb.append(args.get(i));
+      }
+    }
+    stmt.setString(1, sb.toString());
+    stmt.setString(2, tableName);
+    return stmt.executeQuery();
   }
 
 
