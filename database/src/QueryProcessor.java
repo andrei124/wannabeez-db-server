@@ -1,7 +1,6 @@
 import org.postgis.PGgeometry;
 
 import java.io.*;
-import java.security.KeyStore;
 import java.sql.*;
 import java.util.*;
 
@@ -12,18 +11,26 @@ public class QueryProcessor {
   private Properties properties;
   private Connection connection;
 
-  public QueryProcessor() throws IOException {
-    /* Do not connect by default upon creation */
-    connection = null;
+  public QueryProcessor(Connection connection) {
+    this.connection = connection;
 
     File configFile = new File(CONFIG_FILEPATH);
     properties = new Properties();
 
-    FileReader fileReader = new FileReader(configFile);
-    properties.load(fileReader);
+    try {
+      FileReader fileReader = new FileReader(configFile);
+      properties.load(fileReader);
+      String driver = properties.getProperty("driver");
+      registerDriver(driver);
+    } catch (IOException e) {
+      System.out.println("Exception occured when loading the config file");
+      e.printStackTrace();
+    }
+  }
 
-    String driver = properties.getProperty("driver");
-    registerDriver(driver);
+  public QueryProcessor() {
+    /* Do not connect by default upon creation */
+    this(null);
   }
 
   private void registerDriver(String driver) {
@@ -52,7 +59,7 @@ public class QueryProcessor {
   }
 
   public void closeConnection() {
-    if(connection != null) {
+    if (connection != null) {
       try {
         connection.close();
         System.out.println("Connection succesfully closed");
@@ -64,11 +71,9 @@ public class QueryProcessor {
   }
 
 
-/** Prepared SQL Statements methods
- *
-  */
+  /** Prepared SQL Statements methods */
 
-  public int insertInto (String tableName, String... values) throws SQLException {
+  public int insertInto(String tableName, String... values) throws SQLException {
     PreparedStatement stmt = null;
     tableName = tableName.toUpperCase();
     List<String> args = Arrays.asList(values);
@@ -76,62 +81,68 @@ public class QueryProcessor {
     boolean tableExists = true;
 
     switch (tableName) {
-      case "PLAYER": {
+      case "PLAYER":
+        {
           stmt = connection.prepareStatement("insert into PLAYER values(?, ?, ?)");
           stmt.setInt(1, Integer.parseInt(args.get(0)));
           stmt.setString(2, args.get(1));
           stmt.setString(3, args.get(2));
           break;
         }
-      case "PLAYER_STATS": {
-        stmt = connection.prepareStatement("insert into PLAYER_STATS values(?, ?, ?)");
-        stmt.setInt(1, Integer.parseInt(args.get(0)));
-        stmt.setInt(2, Integer.parseInt(args.get(1)));
-        stmt.setInt(3, Integer.parseInt(args.get(2)));
-        break;
-      }
-      case "GALLERY": {
-        stmt = connection.prepareStatement("insert into GALLERY values(?, ?, ?, ?)");
-        stmt.setInt(1, Integer.parseInt(args.get(0)));
-        stmt.setTimestamp(2, Timestamp.valueOf(args.get(1)));
-        stmt.setInt(3, Integer.parseInt(args.get(2)));
-        stmt.setString(4, args.get(3));
-        break;
-      }
-      case "LOCATION": {
-        stmt = connection.prepareStatement("insert into LOCATION values(?, ?)");
-        stmt.setInt(1, Integer.parseInt(args.get(0)));
-        stmt.setObject(2, PGgeometry.geomFromString(args.get(1)));
-        break;
-      }
-      case "LANDMARK": {
-        stmt = connection.prepareStatement("insert into LANDMARK values(?, ?, ?, ?)");
-        stmt.setInt(1, Integer.parseInt(args.get(0)));
-        stmt.setObject(2, PGgeometry.geomFromString(args.get(1)));
-        stmt.setObject(3, Integer.parseInt(args.get(2)));
-        stmt.setString(4, args.get(3));
-        break;
-      }
-      case "LANDMARK_TYPE": {
-        stmt = connection.prepareStatement("insert into LANDMARK_TYPE values(?, ?)");
-        stmt.setInt(1, Integer.parseInt(args.get(0)));
-        stmt.setString(2, args.get(1));
-        break;
-      }
-      default: {
-        System.out.println("Table " + tableName + " does not exist");
-        tableExists = false;
-      }
+      case "PLAYER_STATS":
+        {
+          stmt = connection.prepareStatement("insert into PLAYER_STATS values(?, ?, ?)");
+          stmt.setInt(1, Integer.parseInt(args.get(0)));
+          stmt.setInt(2, Integer.parseInt(args.get(1)));
+          stmt.setInt(3, Integer.parseInt(args.get(2)));
+          break;
+        }
+      case "GALLERY":
+        {
+          stmt = connection.prepareStatement("insert into GALLERY values(?, ?, ?, ?)");
+          stmt.setInt(1, Integer.parseInt(args.get(0)));
+          stmt.setTimestamp(2, Timestamp.valueOf(args.get(1)));
+          stmt.setInt(3, Integer.parseInt(args.get(2)));
+          stmt.setString(4, args.get(3));
+          break;
+        }
+      case "LOCATION":
+        {
+          stmt = connection.prepareStatement("insert into LOCATION values(?, ?)");
+          stmt.setInt(1, Integer.parseInt(args.get(0)));
+          stmt.setObject(2, PGgeometry.geomFromString(args.get(1)));
+          break;
+        }
+      case "LANDMARK":
+        {
+          stmt = connection.prepareStatement("insert into LANDMARK values(?, ?, ?, ?)");
+          stmt.setInt(1, Integer.parseInt(args.get(0)));
+          stmt.setObject(2, PGgeometry.geomFromString(args.get(1)));
+          stmt.setObject(3, Integer.parseInt(args.get(2)));
+          stmt.setString(4, args.get(3));
+          break;
+        }
+      case "LANDMARK_TYPE":
+        {
+          stmt = connection.prepareStatement("insert into LANDMARK_TYPE values(?, ?)");
+          stmt.setInt(1, Integer.parseInt(args.get(0)));
+          stmt.setString(2, args.get(1));
+          break;
+        }
+      default:
+        {
+          System.out.println("Table " + tableName + " does not exist");
+          tableExists = false;
+        }
     }
 
-    if(tableExists) {
+    if (tableExists) {
       index = stmt.executeUpdate();
       stmt.close();
     }
 
     return index;
   }
-
 
   public ResultSet selectFrom(String tableName, String... columns) throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("SELECT ? FROM ?");
@@ -140,8 +151,8 @@ public class QueryProcessor {
     int len = args.size();
 
     StringBuilder sb = new StringBuilder();
-    for(int i = 0; i < len; i++) {
-      if(i != len - 1) {
+    for (int i = 0; i < len; i++) {
+      if (i != len - 1) {
         sb.append(args.get(i)).append(",");
       } else {
         sb.append(args.get(i));
@@ -149,8 +160,15 @@ public class QueryProcessor {
     }
     stmt.setString(1, sb.toString());
     stmt.setString(2, tableName);
-    return stmt.executeQuery();
+
+    ResultSet resultSet = stmt.executeQuery();
+    stmt.close();
+    return resultSet;
   }
 
+  /** TODO: Implemetn Update and Delete SQL Methods *
+   *  public void update(){}
+   *  public void delete(){}
+   */
 
 }
