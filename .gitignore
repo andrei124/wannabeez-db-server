@@ -8,3 +8,5 @@ database/target/
 database/.idea/compiler.xml
 
 database/.idea/jarRepositories.xml
+
+database/src/config.properties
