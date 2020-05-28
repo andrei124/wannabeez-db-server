@@ -1,10 +1,12 @@
 build:
   stage: build
+  image: maven:latest
   script:
     - mvn compile
 
 test:
   stage: test
+  image: maven:latest
   script:
     - mvn test
 
