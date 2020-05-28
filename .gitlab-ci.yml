@@ -1,13 +1,16 @@
-stages:
- - build
- - test
- 
- 
- job build:
+build:
   stage: build
-  script: mvn compile
+  script:
+    - mvn compile
 
+test:
+  stage: test
+  script:
+    - mvn test
 
- job test:
- stage: test
- script: mvn test
+deploy:
+  stage: deploy
+  script:
+    - mvn deploy
+  only:
+    - production
