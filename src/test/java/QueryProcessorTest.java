@@ -7,7 +7,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class QueryProcessorTests {
+public class QueryProcessorTest {
 
     @Rule
     public JUnitRuleMockery context = new JUnitRuleMockery();
@@ -26,7 +26,6 @@ public class QueryProcessorTests {
         }});
 
         int index = queryProcessor.insertInto("Player", "100", "email", "password");
-
     }
 
 }
