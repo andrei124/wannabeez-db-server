@@ -3,12 +3,16 @@ build:
   image: maven:latest
   script:
     - mvn compile
+  except:
+    - production
 
 test:
   stage: test
   image: maven:latest
   script:
     - mvn test
+  except:
+    - production
 
 deploy:
   stage: deploy
