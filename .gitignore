@@ -1,0 +1,12 @@
+
+database/.idea/workspace.xml
+
+database/target/
+
+*.iml
+
+database/.idea/compiler.xml
+
+database/.idea/jarRepositories.xml
+
+database/src/config.properties
