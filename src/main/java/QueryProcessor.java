@@ -6,7 +6,9 @@ import java.util.*;
 
 public class QueryProcessor {
 
-  private static final String CONFIG_FILEPATH = "src/config.properties";
+  private static final String CONFIG_FILEPATH =
+      System.getenv("DB_CONFIG") !=
+          null ? System.getenv("DB_CONFIG") : "src/config.properties";
 
   private Properties properties;
   private Connection connection;
