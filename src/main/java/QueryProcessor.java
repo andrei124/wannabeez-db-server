@@ -75,11 +75,10 @@ public class QueryProcessor {
 
   /** Prepared SQL Statements methods */
 
-  public int insertInto(String tableName, String... values) throws SQLException {
+  public void insertInto(String tableName, String... values) throws SQLException {
     PreparedStatement stmt = null;
     tableName = tableName.toUpperCase();
     List<String> args = Arrays.asList(values);
-    int index = 0;
     boolean tableExists = true;
 
     switch (tableName) {
@@ -120,7 +119,7 @@ public class QueryProcessor {
           stmt = connection.prepareStatement("insert into LANDMARK values(?, ?, ?, ?)");
           stmt.setInt(1, Integer.parseInt(args.get(0)));
           stmt.setObject(2, PGgeometry.geomFromString(args.get(1)));
-          stmt.setObject(3, Integer.parseInt(args.get(2)));
+          stmt.setInt(3, Integer.parseInt(args.get(2)));
           stmt.setString(4, args.get(3));
           break;
         }
@@ -139,14 +138,12 @@ public class QueryProcessor {
     }
 
     if (tableExists) {
-      index = stmt.executeUpdate();
+      stmt.executeUpdate();
       stmt.close();
     }
-
-    return index;
   }
 
-  public ResultSet selectFrom(String tableName, String... columns) throws SQLException {
+  public ResultSet selectFrom (String tableName, String... columns) throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("SELECT ? FROM ?");
 
     List<String> args = Arrays.asList(columns);
