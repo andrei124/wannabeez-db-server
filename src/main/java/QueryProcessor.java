@@ -7,8 +7,7 @@ import java.util.*;
 public class QueryProcessor {
 
   private static final String CONFIG_FILEPATH =
-      System.getenv("DB_CONFIG") !=
-          null ? System.getenv("DB_CONFIG") : "src/config.properties";
+      System.getenv("DB_CONFIG") != null ? System.getenv("DB_CONFIG") : "src/config.properties";
 
   private Properties properties;
   private Connection connection;
@@ -72,9 +71,7 @@ public class QueryProcessor {
     }
   }
 
-
   /** Prepared SQL Statements methods */
-
   public void insertInto(String tableName, String... values) throws SQLException {
     PreparedStatement stmt = null;
     tableName = tableName.toUpperCase();
@@ -143,13 +140,73 @@ public class QueryProcessor {
     }
   }
 
-  public ResultSet selectFrom (String tableName, String... columns) throws SQLException {
+  public ResultSet selectFrom(String tableName, String... columns) throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("SELECT ? FROM ?");
 
-    List<String> args = Arrays.asList(columns);
-    int len = args.size();
+    String queryColums = getParamSQL(columns);
+    stmt.setString(1, queryColums);
+    stmt.setString(2, tableName);
 
+    return getResultSet(stmt);
+  }
+
+  public ResultSet selectFromWhere(
+      String tableName, String indexColumn, String value, String... arguments) throws SQLException {
+    PreparedStatement stmt = connection.prepareStatement("SELECT ? FROM ? WHERE ? = ?");
+
+    setBasicSelectParams(stmt, tableName, indexColumn, arguments);
+    stmt.setString(4, value);
+
+    return getResultSet(stmt);
+  }
+
+  public ResultSet selectFromWhere(
+      String tableName, String indexColumn, Integer value, String... arguments)
+      throws SQLException {
+    PreparedStatement stmt = connection.prepareStatement("SELECT ? FROM ? WHERE ? = ?");
+
+    setBasicSelectParams(stmt, tableName, indexColumn, arguments);
+    stmt.setInt(4, value);
+
+    return getResultSet(stmt);
+  }
+
+  public ResultSet selectFromWhere(
+      String tableName, String indexColumn, PGgeometry value, String... arguments)
+      throws SQLException {
+    PreparedStatement stmt = connection.prepareStatement("SELECT ? FROM ? WHERE ? = ?");
+
+    setBasicSelectParams(stmt, tableName, indexColumn, arguments);
+    stmt.setObject(4, value);
+
+    return getResultSet(stmt);
+  }
+
+  public ResultSet selectFromWhere(
+      String tableName, String indexColumn, Timestamp value, String... arguments)
+      throws SQLException {
+    PreparedStatement stmt = connection.prepareStatement("SELECT ? FROM ? WHERE ? = ?");
+
+    setBasicSelectParams(stmt, tableName, indexColumn, arguments);
+    stmt.setTimestamp(4, value);
+
+    return getResultSet(stmt);
+  }
+
+  private void setBasicSelectParams(
+      PreparedStatement stmt, String tableName, String indexColumn, String... arguments)
+      throws SQLException {
+    String queryColumns = getParamSQL(arguments);
+    stmt.setString(1, queryColumns);
+    stmt.setString(2, tableName);
+    stmt.setString(3, indexColumn);
+  }
+
+  private String getParamSQL(String... arguments) {
+    List<String> args = Arrays.asList(arguments);
+    int len = args.size();
     StringBuilder sb = new StringBuilder();
+
     for (int i = 0; i < len; i++) {
       if (i != len - 1) {
         sb.append(args.get(i)).append(",");
@@ -157,17 +214,18 @@ public class QueryProcessor {
         sb.append(args.get(i));
       }
     }
-    stmt.setString(1, sb.toString());
-    stmt.setString(2, tableName);
+    return sb.toString();
+  }
 
+  private ResultSet getResultSet(PreparedStatement stmt) throws SQLException {
     ResultSet resultSet = stmt.executeQuery();
     stmt.close();
     return resultSet;
   }
 
-  /** TODO: Implemetn Update and Delete SQL Methods *
-   *  public void update(){}
-   *  public void delete(){}
+  /**
+   * TODO: Implement Update and Delete SQL Methods *
+   * public void update(){}
+   * public void delete(){}
    */
-
 }
