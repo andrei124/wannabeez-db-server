@@ -20,5 +20,5 @@ deploy:
     - sh session.sh
   tags:
     - production
-#  only:
-#    - master
+  only:
+    - master
