@@ -172,7 +172,7 @@ public class QueryProcessor {
   public ResultSet selectFrom(String tableName, String... columns) throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("SELECT ? FROM ?");
 
-    String queryColums = getParamSQL(columns);
+    String queryColums = getColumnsToBeQueried(columns);
     stmt.setString(1, queryColums);
     stmt.setString(2, tableName);
 
@@ -194,7 +194,7 @@ public class QueryProcessor {
       String tableName, String indexColumn, String value, String... arguments) throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("SELECT ? FROM ? WHERE ? = ?");
 
-    setBasicSelectParams(stmt, tableName, indexColumn, arguments);
+    setStandardSelectParams(stmt, tableName, indexColumn, arguments);
     stmt.setString(4, value);
 
     return getResultSet(stmt);
@@ -205,7 +205,7 @@ public class QueryProcessor {
       throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("SELECT ? FROM ? WHERE ? = ?");
 
-    setBasicSelectParams(stmt, tableName, indexColumn, arguments);
+    setStandardSelectParams(stmt, tableName, indexColumn, arguments);
     stmt.setInt(4, value);
 
     return getResultSet(stmt);
@@ -216,7 +216,7 @@ public class QueryProcessor {
       throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("SELECT ? FROM ? WHERE ? = ?");
 
-    setBasicSelectParams(stmt, tableName, indexColumn, arguments);
+    setStandardSelectParams(stmt, tableName, indexColumn, arguments);
     stmt.setObject(4, value);
 
     return getResultSet(stmt);
@@ -227,14 +227,14 @@ public class QueryProcessor {
       throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("SELECT ? FROM ? WHERE ? = ?");
 
-    setBasicSelectParams(stmt, tableName, indexColumn, arguments);
+    setStandardSelectParams(stmt, tableName, indexColumn, arguments);
     stmt.setTimestamp(4, value);
 
     return getResultSet(stmt);
   }
 
   /**
-   * Helper method for SELECT statements with WHERE clause *
+   * Helper Method for setting standard query parameters of an SELECT SQL statement *
    *
    * @param stmt - the statement to set parameters for
    * @param tableName - name of table to make query on
@@ -242,22 +242,22 @@ public class QueryProcessor {
    * @param arguments - columns to be selected
    * @throws SQLException
    */
-  private void setBasicSelectParams(
+  private void setStandardSelectParams(
       PreparedStatement stmt, String tableName, String indexColumn, String... arguments)
       throws SQLException {
-    String queryColumns = getParamSQL(arguments);
+    String queryColumns = getColumnsToBeQueried(arguments);
     stmt.setString(1, queryColumns);
     stmt.setString(2, tableName);
     stmt.setString(3, indexColumn);
   }
 
   /**
-   * Helper method for getting the columns to be parsed into the SELECT statement *
+   * Helper method for getting the columns to be queried into the SELECT statement *
    *
    * @param arguments - list of column names to be selected
    * @return
    */
-  private String getParamSQL(String... arguments) {
+  private String getColumnsToBeQueried(String... arguments) {
     List<String> args = Arrays.asList(arguments);
     int len = args.size();
     StringBuilder sb = new StringBuilder();
@@ -302,7 +302,7 @@ public class QueryProcessor {
       String table, String setParam, String setValue, String whereParam, String whereValue)
       throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
-    setBasicUpdateParams(table, setParam, whereParam, stmt);
+    setStandardUpdateParams(table, setParam, whereParam, stmt);
     stmt.setString(3, setValue);
     stmt.setString(5, whereValue);
     executeSQLStatement(stmt);
@@ -312,7 +312,7 @@ public class QueryProcessor {
       String table, String setParam, String setValue, String whereParam, Integer whereValue)
       throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
-    setBasicUpdateParams(table, setParam, whereParam, stmt);
+    setStandardUpdateParams(table, setParam, whereParam, stmt);
     stmt.setString(3, setValue);
     stmt.setInt(5, whereValue);
     executeSQLStatement(stmt);
@@ -322,7 +322,7 @@ public class QueryProcessor {
       String table, String setParam, String setValue, String whereParam, Timestamp whereValue)
       throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
-    setBasicUpdateParams(table, setParam, whereParam, stmt);
+    setStandardUpdateParams(table, setParam, whereParam, stmt);
     stmt.setString(3, setValue);
     stmt.setTimestamp(5, whereValue);
     executeSQLStatement(stmt);
@@ -332,7 +332,7 @@ public class QueryProcessor {
       String table, String setParam, String setValue, String whereParam, PGgeometry whereValue)
       throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
-    setBasicUpdateParams(table, setParam, whereParam, stmt);
+    setStandardUpdateParams(table, setParam, whereParam, stmt);
     stmt.setString(3, setValue);
     stmt.setObject(5, whereValue);
     executeSQLStatement(stmt);
@@ -342,7 +342,7 @@ public class QueryProcessor {
       String table, String setParam, Integer setValue, String whereParam, String whereValue)
       throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
-    setBasicUpdateParams(table, setParam, whereParam, stmt);
+    setStandardUpdateParams(table, setParam, whereParam, stmt);
     stmt.setInt(3, setValue);
     stmt.setString(5, whereValue);
     executeSQLStatement(stmt);
@@ -352,7 +352,7 @@ public class QueryProcessor {
       String table, String setParam, Integer setValue, String whereParam, Integer whereValue)
       throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
-    setBasicUpdateParams(table, setParam, whereParam, stmt);
+    setStandardUpdateParams(table, setParam, whereParam, stmt);
     stmt.setInt(3, setValue);
     stmt.setInt(5, whereValue);
     executeSQLStatement(stmt);
@@ -362,7 +362,7 @@ public class QueryProcessor {
       String table, String setParam, Integer setValue, String whereParam, Timestamp whereValue)
       throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
-    setBasicUpdateParams(table, setParam, whereParam, stmt);
+    setStandardUpdateParams(table, setParam, whereParam, stmt);
     stmt.setInt(3, setValue);
     stmt.setTimestamp(5, whereValue);
     executeSQLStatement(stmt);
@@ -372,7 +372,7 @@ public class QueryProcessor {
       String table, String setParam, Integer setValue, String whereParam, PGgeometry whereValue)
       throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
-    setBasicUpdateParams(table, setParam, whereParam, stmt);
+    setStandardUpdateParams(table, setParam, whereParam, stmt);
     stmt.setInt(3, setValue);
     stmt.setObject(5, whereValue);
     executeSQLStatement(stmt);
@@ -382,7 +382,7 @@ public class QueryProcessor {
       String table, String setParam, Timestamp setValue, String whereParam, String whereValue)
       throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
-    setBasicUpdateParams(table, setParam, whereParam, stmt);
+    setStandardUpdateParams(table, setParam, whereParam, stmt);
     stmt.setTimestamp(3, setValue);
     stmt.setString(5, whereValue);
     executeSQLStatement(stmt);
@@ -392,7 +392,7 @@ public class QueryProcessor {
       String table, String setParam, Timestamp setValue, String whereParam, Integer whereValue)
       throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
-    setBasicUpdateParams(table, setParam, whereParam, stmt);
+    setStandardUpdateParams(table, setParam, whereParam, stmt);
     stmt.setTimestamp(3, setValue);
     stmt.setInt(5, whereValue);
     executeSQLStatement(stmt);
@@ -402,7 +402,7 @@ public class QueryProcessor {
       String table, String setParam, Timestamp setValue, String whereParam, Timestamp whereValue)
       throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
-    setBasicUpdateParams(table, setParam, whereParam, stmt);
+    setStandardUpdateParams(table, setParam, whereParam, stmt);
     stmt.setTimestamp(3, setValue);
     stmt.setTimestamp(5, whereValue);
     executeSQLStatement(stmt);
@@ -412,7 +412,7 @@ public class QueryProcessor {
       String table, String setParam, Timestamp setValue, String whereParam, PGgeometry whereValue)
       throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
-    setBasicUpdateParams(table, setParam, whereParam, stmt);
+    setStandardUpdateParams(table, setParam, whereParam, stmt);
     stmt.setTimestamp(3, setValue);
     stmt.setObject(5, whereValue);
     executeSQLStatement(stmt);
@@ -422,7 +422,7 @@ public class QueryProcessor {
       String table, String setParam, PGgeometry setValue, String whereParam, String whereValue)
       throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
-    setBasicUpdateParams(table, setParam, whereParam, stmt);
+    setStandardUpdateParams(table, setParam, whereParam, stmt);
     stmt.setObject(3, setValue);
     stmt.setString(5, whereValue);
     executeSQLStatement(stmt);
@@ -432,7 +432,7 @@ public class QueryProcessor {
       String table, String setParam, PGgeometry setValue, String whereParam, Integer whereValue)
       throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
-    setBasicUpdateParams(table, setParam, whereParam, stmt);
+    setStandardUpdateParams(table, setParam, whereParam, stmt);
     stmt.setObject(3, setValue);
     stmt.setInt(5, whereValue);
     executeSQLStatement(stmt);
@@ -442,7 +442,7 @@ public class QueryProcessor {
       String table, String setParam, PGgeometry setValue, String whereParam, Timestamp whereValue)
       throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
-    setBasicUpdateParams(table, setParam, whereParam, stmt);
+    setStandardUpdateParams(table, setParam, whereParam, stmt);
     stmt.setObject(3, setValue);
     stmt.setTimestamp(5, whereValue);
     executeSQLStatement(stmt);
@@ -452,7 +452,7 @@ public class QueryProcessor {
       String table, String setParam, PGgeometry setValue, String whereParam, PGgeometry whereValue)
       throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
-    setBasicUpdateParams(table, setParam, whereParam, stmt);
+    setStandardUpdateParams(table, setParam, whereParam, stmt);
     stmt.setObject(3, setValue);
     stmt.setObject(5, whereValue);
     executeSQLStatement(stmt);
@@ -467,7 +467,7 @@ public class QueryProcessor {
    * @param stmt -- Prepared statement for which we set these parameters
    * @throws SQLException
    */
-  private void setBasicUpdateParams(
+  private void setStandardUpdateParams(
       String table, String setParam, String whereParam, PreparedStatement stmt)
       throws SQLException {
     stmt.setString(1, table);
@@ -475,6 +475,47 @@ public class QueryProcessor {
     stmt.setString(4, whereParam);
   }
 
-  /** TODO: Implement Delete SQL Methods *
-   *  public void delete(){} */
+  public void deleteFrom(String table) throws SQLException {
+    PreparedStatement stmt = connection.prepareStatement("DELETE FROM ?");
+    stmt.setString(1, table);
+    executeSQLStatement(stmt);
+  }
+
+  public void deleteFromWhere(String table, String whereParam, String whereValue)
+      throws SQLException {
+    PreparedStatement stmt = connection.prepareStatement("DELETE FROM ? WHERE ? = ?");
+    setStandardDeleteParams(stmt, table, whereParam);
+    stmt.setString(3, whereValue);
+    executeSQLStatement(stmt);
+  }
+
+  public void deleteFromWhere(String table, String whereParam, Integer whereValue)
+      throws SQLException {
+    PreparedStatement stmt = connection.prepareStatement("DELETE FROM ? WHERE ? = ?");
+    setStandardDeleteParams(stmt, table, whereParam);
+    stmt.setInt(3, whereValue);
+    executeSQLStatement(stmt);
+  }
+
+  public void deleteFromWhere(String table, String whereParam, Timestamp whereValue)
+      throws SQLException {
+    PreparedStatement stmt = connection.prepareStatement("DELETE FROM ? WHERE ? = ?");
+    setStandardDeleteParams(stmt, table, whereParam);
+    stmt.setTimestamp(3, whereValue);
+    executeSQLStatement(stmt);
+  }
+
+  public void deleteFromWhere(String table, String whereParam, PGgeometry whereValue)
+      throws SQLException {
+    PreparedStatement stmt = connection.prepareStatement("DELETE FROM ? WHERE ? = ?");
+    setStandardDeleteParams(stmt, table, whereParam);
+    stmt.setObject(3, whereValue);
+    executeSQLStatement(stmt);
+  }
+
+  private void setStandardDeleteParams(PreparedStatement stmt, String table, String whereParam)
+      throws SQLException {
+    stmt.setString(1, table);
+    stmt.setString(2, whereParam);
+  }
 }
