@@ -34,6 +34,9 @@ public class QueryProcessor {
     this(null);
   }
 
+  /** Method for registering a JDBC Driver for PostgreSQL *
+   * @param driver -- driver name
+   */
   private void registerDriver(String driver) {
     try {
       Class.forName(driver);
@@ -45,6 +48,9 @@ public class QueryProcessor {
     }
   }
 
+  /** Method for establishing a connection with the DB Server *
+   * @return Connection object
+   */
   public Connection connect() {
     String url = properties.getProperty("url");
     String user = properties.getProperty("user");
@@ -59,6 +65,9 @@ public class QueryProcessor {
     return connection;
   }
 
+  /** Method for closing an existing connection with the DB Server *
+   * Connection must not be null
+   */
   public void closeConnection() {
     if (connection != null) {
       try {
@@ -71,7 +80,12 @@ public class QueryProcessor {
     }
   }
 
-  /** Prepared SQL Statements methods */
+  /** Method for Prepared INSERT SQL Statement *
+   * If table name not predefined query not attempted
+   * @param tableName
+   * @param values
+   * @throws SQLException
+   */
   public void insertInto(String tableName, String... values) throws SQLException {
     PreparedStatement stmt = null;
     tableName = tableName.toUpperCase();
@@ -140,6 +154,13 @@ public class QueryProcessor {
     }
   }
 
+
+  /** Method for Prepared SELECT SQL statement *
+   * @param tableName -- name of table to make query on
+   * @param columns -- columns to be selected
+   * @return ResultSet -- object representing retrieved rows
+   * @throws SQLException
+   */
   public ResultSet selectFrom(String tableName, String... columns) throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("SELECT ? FROM ?");
 
@@ -150,6 +171,15 @@ public class QueryProcessor {
     return getResultSet(stmt);
   }
 
+  /** Method for Prepared SELECT with WHERE clause SQL statements *
+   * Method is overloaded for each of the different types an entry in the database can take
+   * @param tableName -- name of table to make query on
+   * @param indexColumn -- filtering paramenter in the WHERE clause
+   * @param value -- value required for the filtering parameter
+   * @param arguments -- columns to be selected
+   * @return ResultSet -- object representing retrieved rows
+   * @throws SQLException
+   */
   public ResultSet selectFromWhere(
       String tableName, String indexColumn, String value, String... arguments) throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("SELECT ? FROM ? WHERE ? = ?");
@@ -193,6 +223,13 @@ public class QueryProcessor {
     return getResultSet(stmt);
   }
 
+  /** Helper method for SELECT statements with WHERE clause *
+   * @param stmt - the statement to set parameters for
+   * @param tableName - name of table to make query on
+   * @param indexColumn - filtering paramenter in the WHERE clause
+   * @param arguments - columns to be selected
+   * @throws SQLException
+   */
   private void setBasicSelectParams(
       PreparedStatement stmt, String tableName, String indexColumn, String... arguments)
       throws SQLException {
@@ -202,6 +239,10 @@ public class QueryProcessor {
     stmt.setString(3, indexColumn);
   }
 
+  /** Helper method for getting the columns to be parsed into the SELECT statement *
+    * @param arguments - list of column names to be selected
+   * @return
+   */
   private String getParamSQL(String... arguments) {
     List<String> args = Arrays.asList(arguments);
     int len = args.size();
@@ -217,11 +258,17 @@ public class QueryProcessor {
     return sb.toString();
   }
 
+  /** Helper method for retrieving the result of an SQL query *
+   * @param stmt - statement to retrieve the result for
+   * @return
+   * @throws SQLException
+   */
   private ResultSet getResultSet(PreparedStatement stmt) throws SQLException {
     ResultSet resultSet = stmt.executeQuery();
     stmt.close();
     return resultSet;
   }
+
 
   /**
    * TODO: Implement Update and Delete SQL Methods *

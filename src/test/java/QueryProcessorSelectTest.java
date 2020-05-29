@@ -11,55 +11,66 @@ import java.sql.Timestamp;
 
 public class QueryProcessorSelectTest {
 
-    @Rule
-    public JUnitRuleMockery context = new JUnitRuleMockery();
-    Connection mockJDBCconnection = context.mock(Connection.class);
+  @Rule public JUnitRuleMockery context = new JUnitRuleMockery();
+  Connection mockJDBCconnection = context.mock(Connection.class);
 
-    final Timestamp exampleTS = new Timestamp(2020, 5, 29, 7, 5, 5, 6);
-    final PGgeometry examplePG = new PGgeometry(new Point(12, 34));
-    final String exampleSTR = "Example";
-    QueryProcessor queryProcessor = new QueryProcessor(mockJDBCconnection);
+  final Timestamp exampleTS = new Timestamp(2020, 5, 29, 7, 5, 5, 6);
+  final PGgeometry examplePG = new PGgeometry(new Point(12, 34));
+  final String exampleSTR = "Example";
+  QueryProcessor queryProcessor = new QueryProcessor(mockJDBCconnection);
 
-
-    @Test
-    public void selectStatementParsedCorrectly() throws SQLException {
-        context.checking(new Expectations() {{
+  @Test
+  public void selectStatementParsedCorrectly() throws SQLException {
+    context.checking(
+        new Expectations() {
+          {
             exactly(1).of(mockJDBCconnection).prepareStatement("SELECT ? FROM ?");
-        }});
-        queryProcessor.selectFrom("Player", "id");
-    }
+          }
+        });
+    queryProcessor.selectFrom("Player", "id");
+  }
 
-    @Test
-    public void selectStatementWithWhereClauseIntegerParsedCorrectly() throws SQLException {
-        context.checking(new Expectations() {{
+  @Test
+  public void selectStatementWithWhereClauseIntegerParsedCorrectly() throws SQLException {
+    context.checking(
+        new Expectations() {
+          {
             exactly(1).of(mockJDBCconnection).prepareStatement("SELECT ? FROM ? WHERE ? = ?");
-        }});
-        queryProcessor.selectFromWhere("Player", "id", 1, "*");
-    }
+          }
+        });
+    queryProcessor.selectFromWhere("Player", "id", 1, "*");
+  }
 
-    @Test
-     public void selectStatementWithWhereClausePGeometryParsedCorrectly() throws SQLException {
-        context.checking(new Expectations() {{
+  @Test
+  public void selectStatementWithWhereClausePGeometryParsedCorrectly() throws SQLException {
+    context.checking(
+        new Expectations() {
+          {
             exactly(1).of(mockJDBCconnection).prepareStatement("SELECT ? FROM ? WHERE ? = ?");
-        }});
-        queryProcessor.selectFromWhere("Location", "location", examplePG, "id");
-    }
+          }
+        });
+    queryProcessor.selectFromWhere("Location", "location", examplePG, "id");
+  }
 
-    @Test
-    public void selectStatementWithWhereClauseTimestampParsedCorrectly() throws SQLException {
-        context.checking(new Expectations() {{
+  @Test
+  public void selectStatementWithWhereClauseTimestampParsedCorrectly() throws SQLException {
+    context.checking(
+        new Expectations() {
+          {
             exactly(1).of(mockJDBCconnection).prepareStatement("SELECT ? FROM ? WHERE ? = ?");
-        }});
-        queryProcessor.selectFromWhere("Gallery", "ts", exampleTS, "player_id,url");
-    }
+          }
+        });
+    queryProcessor.selectFromWhere("Gallery", "ts", exampleTS, "player_id,url");
+  }
 
-    @Test
-    public void selectStatementWithWhereClauseStringParsedCorrectly() throws SQLException {
-        context.checking(new Expectations() {{
+  @Test
+  public void selectStatementWithWhereClauseStringParsedCorrectly() throws SQLException {
+    context.checking(
+        new Expectations() {
+          {
             exactly(1).of(mockJDBCconnection).prepareStatement("SELECT ? FROM ? WHERE ? = ?");
-        }});
-        queryProcessor.selectFromWhere("Landmark", "description", exampleSTR, "type");
-    }
-
-
+          }
+        });
+    queryProcessor.selectFromWhere("Landmark", "description", exampleSTR, "type");
+  }
 }
