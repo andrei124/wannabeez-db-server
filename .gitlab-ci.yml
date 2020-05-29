@@ -16,7 +16,7 @@ deploy:
   script:
     - mvn clean
     - mvn install
-    - ls
+    - sh session.sh
   tags:
     - production
 #  only:
