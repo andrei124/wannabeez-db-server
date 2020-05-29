@@ -180,8 +180,8 @@ public class QueryProcessor {
   }
 
   /**
-   * Method for Prepared SELECT with WHERE clause SQL statements * Method is overloaded for each of
-   * the different types an entry in the database can take
+   * Method for Prepared SELECT with WHERE clause SQL statements *
+   * Method is overloaded for each of the different types an entry in the database can take
    *
    * @param tableName -- name of table to make query on
    * @param indexColumn -- filtering paramenter in the WHERE clause
@@ -285,6 +285,19 @@ public class QueryProcessor {
     return resultSet;
   }
 
+  /**
+   * Method for Prepared UPDATE SQL statement *
+   * Method is overloaded to support UPDATE statements
+   * for every possible combination of (setValue, whereValue)
+   * (e.g. UPDATE ? SET ? = String WHERE ? = Integer)
+   *
+   * @param table -- name of table to be updated
+   * @param setParam -- name of column to be set
+   * @param setValue -- updated value of the column to be set
+   * @param whereParam -- name of filtering parameter in WHERE clause
+   * @param whereValue -- actual value of filtering parameter
+   * @throws SQLException
+   */
   public void update(
       String table, String setParam, String setValue, String whereParam, String whereValue)
       throws SQLException {
@@ -445,6 +458,15 @@ public class QueryProcessor {
     executeSQLStatement(stmt);
   }
 
+  /**
+   * Helper Method for setting standard query parameters of an UPDATE SQL statement *
+   *
+   * @param table -- name of table to be updated
+   * @param setParam -- name of column to be set
+   * @param whereParam -- filtering parameter in WHERE clause
+   * @param stmt -- Prepared statement for which we set these parameters
+   * @throws SQLException
+   */
   private void setBasicUpdateParams(
       String table, String setParam, String whereParam, PreparedStatement stmt)
       throws SQLException {
@@ -453,8 +475,6 @@ public class QueryProcessor {
     stmt.setString(4, whereParam);
   }
 
-  /**
-   * TODO: Implement Update and Delete SQL Methods *
-   * public void delete(){}
-   */
+  /** TODO: Implement Delete SQL Methods *
+   *  public void delete(){} */
 }

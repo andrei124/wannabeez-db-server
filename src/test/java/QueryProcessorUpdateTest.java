@@ -139,6 +139,13 @@ public class QueryProcessorUpdateTest {
     queryProcessor.update("Gallery", "ts", exampleTS, "ts", exampleTS);
   }
 
+    /** Test performed on a MOCK_TABLE since the combination
+     * (setValue, whereValue) = (Timestamp, PGeometry) does not
+     * currently exists in any of our actual DB
+     * Created for potential extension of our DB requirements
+     * and for Unit Testing only
+     * @throws SQLException
+     */
   @Test
   public void updateSetTimestampWherePGeometryHandledCorrectly() throws SQLException {
     context.checking(
@@ -172,6 +179,14 @@ public class QueryProcessorUpdateTest {
     queryProcessor.update("Landmark", "location", examplePG, "id", 56);
   }
 
+
+    /** Test performed on a MOCK_TABLE since the combination
+     * (setValue, whereValue) = (PGeometry, Timestamp) does not
+     * currently exists in any of our actual DB
+     * Created for potential extension of our DB requirements
+     * and for Unit Testing only
+     * @throws SQLException
+     */
   @Test
   public void updateSetPGeometryWhereTimestampHandledCorrectly() throws SQLException {
     context.checking(
