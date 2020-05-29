@@ -16,7 +16,8 @@ deploy:
   script:
     - mvn clean
     - mvn install
+    - ls
   tags:
     - production
-  only:
-    - master
+#  only:
+#    - master
