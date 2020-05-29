@@ -8,8 +8,6 @@ test:
   stage: test
   image: maven:latest
   script:
-    - pwd
-    - export DBCONFIG="/home/usermcadmin/config.properties"
     - mvn test
 
 
