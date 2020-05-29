@@ -14,7 +14,7 @@ test:
 deploy:
   stage: deploy
   script:
-    - export DBCONFIG="/home/usermcadmin/config.properties"
+    - export DB_CONFIG="/home/usermcadmin/config.properties"
     - mvn clean
     - mvn install
     - sh session.sh
