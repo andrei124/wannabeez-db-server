@@ -24,7 +24,7 @@ public class QueryProcessorSelectTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("SELECT ? FROM ?");
+            exactly(1).of(mockJDBCconnection).prepareStatement("SELECT id FROM Player");
           }
         });
     queryProcessor.selectFrom("Player", "id");
@@ -35,7 +35,7 @@ public class QueryProcessorSelectTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("SELECT ? FROM ? WHERE ? = ?");
+            exactly(1).of(mockJDBCconnection).prepareStatement("SELECT * FROM Player WHERE id = ?");
           }
         });
     queryProcessor.selectFromWhere("Player", "id", 1, "*");
@@ -46,7 +46,7 @@ public class QueryProcessorSelectTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("SELECT ? FROM ? WHERE ? = ?");
+            exactly(1).of(mockJDBCconnection).prepareStatement("SELECT id FROM Location WHERE location = ?");
           }
         });
     queryProcessor.selectFromWhere("Location", "location", examplePG, "id");
@@ -57,7 +57,7 @@ public class QueryProcessorSelectTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("SELECT ? FROM ? WHERE ? = ?");
+            exactly(1).of(mockJDBCconnection).prepareStatement("SELECT player_id,url FROM Gallery WHERE ts = ?");
           }
         });
     queryProcessor.selectFromWhere("Gallery", "ts", exampleTS, "player_id,url");
@@ -68,7 +68,7 @@ public class QueryProcessorSelectTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("SELECT ? FROM ? WHERE ? = ?");
+            exactly(1).of(mockJDBCconnection).prepareStatement("SELECT type FROM Landmark WHERE description = ?");
           }
         });
     queryProcessor.selectFromWhere("Landmark", "description", exampleSTR, "type");

@@ -86,7 +86,7 @@ public class QueryProcessor {
    * Methods for Prepared INSERT SQL Statements * Overloaded methods to support all possible types
    * of values to be inserted into DB Each overloaded method is designed for a specific table
    *
-   * Insert SQL Prepared statement for PLAYER *
+   * <p>Insert SQL Prepared statement for PLAYER *
    */
   public void insert(String tableName, Integer id, String email, String password)
       throws SQLException {
@@ -165,11 +165,11 @@ public class QueryProcessor {
    * @throws SQLException
    */
   public ResultSet selectFrom(String tableName, String... columns) throws SQLException {
-    PreparedStatement stmt = connection.prepareStatement("SELECT ? FROM ?");
+    PreparedStatement stmt =
+        connection.prepareStatement("SELECT " + getColumnsToBeQueried(columns) + " FROM " + tableName);
 
     String queryColums = getColumnsToBeQueried(columns);
-    stmt.setString(1, queryColums);
-    stmt.setString(2, tableName);
+    System.out.println("Columns to be queired: " + queryColums);
 
     return getResultSet(stmt);
   }
@@ -179,7 +179,7 @@ public class QueryProcessor {
    * the different types an entry in the database can take
    *
    * @param tableName -- name of table to make query on
-   * @param indexColumn -- filtering paramenter in the WHERE clause
+   * @param indexColumn -- filtering parameter in the WHERE clause
    * @param value -- value required for the filtering parameter
    * @param arguments -- columns to be selected
    * @return ResultSet -- object representing retrieved rows
@@ -187,9 +187,16 @@ public class QueryProcessor {
    */
   public ResultSet selectFromWhere(
       String tableName, String indexColumn, String value, String... arguments) throws SQLException {
-    PreparedStatement stmt = connection.prepareStatement("SELECT ? FROM ? WHERE ? = ?");
+    PreparedStatement stmt =
+        connection.prepareStatement(
+            "SELECT "
+                + getColumnsToBeQueried(arguments)
+                + " FROM "
+                + tableName
+                + " WHERE "
+                + indexColumn
+                + " = ?");
 
-    setStandardSelectParams(stmt, tableName, indexColumn, arguments);
     stmt.setString(4, value);
 
     return getResultSet(stmt);
@@ -198,9 +205,16 @@ public class QueryProcessor {
   public ResultSet selectFromWhere(
       String tableName, String indexColumn, Integer value, String... arguments)
       throws SQLException {
-    PreparedStatement stmt = connection.prepareStatement("SELECT ? FROM ? WHERE ? = ?");
+    PreparedStatement stmt =
+        connection.prepareStatement(
+            "SELECT "
+                + getColumnsToBeQueried(arguments)
+                + " FROM "
+                + tableName
+                + " WHERE "
+                + indexColumn
+                + " = ?");
 
-    setStandardSelectParams(stmt, tableName, indexColumn, arguments);
     stmt.setInt(4, value);
 
     return getResultSet(stmt);
@@ -209,9 +223,16 @@ public class QueryProcessor {
   public ResultSet selectFromWhere(
       String tableName, String indexColumn, PGgeometry value, String... arguments)
       throws SQLException {
-    PreparedStatement stmt = connection.prepareStatement("SELECT ? FROM ? WHERE ? = ?");
+    PreparedStatement stmt =
+        connection.prepareStatement(
+            "SELECT "
+                + getColumnsToBeQueried(arguments)
+                + " FROM "
+                + tableName
+                + " WHERE "
+                + indexColumn
+                + " = ?");
 
-    setStandardSelectParams(stmt, tableName, indexColumn, arguments);
     stmt.setObject(4, value);
 
     return getResultSet(stmt);
@@ -220,9 +241,16 @@ public class QueryProcessor {
   public ResultSet selectFromWhere(
       String tableName, String indexColumn, Timestamp value, String... arguments)
       throws SQLException {
-    PreparedStatement stmt = connection.prepareStatement("SELECT ? FROM ? WHERE ? = ?");
+    PreparedStatement stmt =
+        connection.prepareStatement(
+            "SELECT "
+                + getColumnsToBeQueried(arguments)
+                + " FROM "
+                + tableName
+                + " WHERE "
+                + indexColumn
+                + " = ?");
 
-    setStandardSelectParams(stmt, tableName, indexColumn, arguments);
     stmt.setTimestamp(4, value);
 
     return getResultSet(stmt);
@@ -275,9 +303,7 @@ public class QueryProcessor {
    * @throws SQLException
    */
   private ResultSet getResultSet(PreparedStatement stmt) throws SQLException {
-    ResultSet resultSet = stmt.executeQuery();
-    stmt.close();
-    return resultSet;
+    return stmt.executeQuery();
   }
 
   /**
