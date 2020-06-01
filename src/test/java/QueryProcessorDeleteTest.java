@@ -23,7 +23,7 @@ public class QueryProcessorDeleteTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("DELETE FROM ?");
+            exactly(1).of(mockJDBCconnection).prepareStatement("DELETE FROM Player");
           }
         });
     queryProcessor.deleteFrom("Player");
@@ -34,7 +34,9 @@ public class QueryProcessorDeleteTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("DELETE FROM ? WHERE ? = ?");
+            exactly(1)
+                .of(mockJDBCconnection)
+                .prepareStatement("DELETE FROM Player WHERE email = ?");
           }
         });
     queryProcessor.deleteFromWhere("Player", "email", "example@email.com");
@@ -45,7 +47,9 @@ public class QueryProcessorDeleteTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("DELETE FROM ? WHERE ? = ?");
+            exactly(1)
+                .of(mockJDBCconnection)
+                .prepareStatement("DELETE FROM Landmark_Type WHERE id = ?");
           }
         });
     queryProcessor.deleteFromWhere("Landmark_Type", "id", 7);
@@ -56,7 +60,7 @@ public class QueryProcessorDeleteTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("DELETE FROM ? WHERE ? = ?");
+            exactly(1).of(mockJDBCconnection).prepareStatement("DELETE FROM Gallery WHERE ts = ?");
           }
         });
     queryProcessor.deleteFromWhere("Gallery", "ts", exampleTS);
@@ -67,7 +71,9 @@ public class QueryProcessorDeleteTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("DELETE FROM ? WHERE ? = ?");
+            exactly(1)
+                .of(mockJDBCconnection)
+                .prepareStatement("DELETE FROM Location WHERE location = ?");
           }
         });
     queryProcessor.deleteFromWhere("Location", "location", examplePG);
