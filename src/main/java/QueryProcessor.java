@@ -197,7 +197,7 @@ public class QueryProcessor {
                 + indexColumn
                 + " = ?");
 
-    stmt.setString(4, value);
+    stmt.setString(1, value);
 
     return getResultSet(stmt);
   }
@@ -215,7 +215,7 @@ public class QueryProcessor {
                 + indexColumn
                 + " = ?");
 
-    stmt.setInt(4, value);
+    stmt.setInt(1, value);
 
     return getResultSet(stmt);
   }
@@ -233,7 +233,7 @@ public class QueryProcessor {
                 + indexColumn
                 + " = ?");
 
-    stmt.setObject(4, value);
+    stmt.setObject(1, value);
 
     return getResultSet(stmt);
   }
@@ -251,7 +251,7 @@ public class QueryProcessor {
                 + indexColumn
                 + " = ?");
 
-    stmt.setTimestamp(4, value);
+    stmt.setTimestamp(1, value);
 
     return getResultSet(stmt);
   }
