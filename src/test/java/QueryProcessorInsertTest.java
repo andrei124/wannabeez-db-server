@@ -24,7 +24,7 @@ public class QueryProcessorInsertTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("insert into ? values(?, ?, ?)");
+            exactly(1).of(mockJDBCconnection).prepareStatement("insert into Player values(?, ?, ?)");
           }
         });
 
@@ -37,11 +37,11 @@ public class QueryProcessorInsertTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("insert into ? values(?, ?, ?, ?)");
+            exactly(1).of(mockJDBCconnection).prepareStatement("insert into Gallery values(?, ?, ?, ?)");
           }
         });
 
-    queryProcessor.insert("GalleRY", 1, exampleTS, 2, "Description");
+    queryProcessor.insert("Gallery", 1, exampleTS, 2, "Description");
   }
 
   @Test
@@ -50,11 +50,11 @@ public class QueryProcessorInsertTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("insert into ? values(?, ?, ?)");
+            exactly(1).of(mockJDBCconnection).prepareStatement("insert into Player_Stats values(?, ?, ?)");
           }
         });
 
-    queryProcessor.insert("player_STATS", 12, 102, 1236);
+    queryProcessor.insert("Player_Stats", 12, 102, 1236);
   }
 
   @Test
@@ -63,7 +63,7 @@ public class QueryProcessorInsertTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("insert into ? values(?, ?)");
+            exactly(1).of(mockJDBCconnection).prepareStatement("insert into LOCATION values(?, ?)");
           }
         });
 
@@ -76,7 +76,7 @@ public class QueryProcessorInsertTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("insert into ? values(?, ?, ?, ?)");
+            exactly(1).of(mockJDBCconnection).prepareStatement("insert into LANDMARK values(?, ?, ?, ?)");
           }
         });
 
@@ -89,7 +89,7 @@ public class QueryProcessorInsertTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("insert into ? values(?, ?)");
+            exactly(1).of(mockJDBCconnection).prepareStatement("insert into landmark_type values(?, ?)");
           }
         });
 

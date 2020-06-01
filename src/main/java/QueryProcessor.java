@@ -90,42 +90,38 @@ public class QueryProcessor {
    */
   public void insert(String tableName, Integer id, String email, String password)
       throws SQLException {
-    PreparedStatement stmt = connection.prepareStatement("insert into ? values(?, ?, ?)");
-    stmt.setString(1, tableName);
-    stmt.setInt(2, id);
-    stmt.setString(3, email);
-    stmt.setString(4, password);
+    PreparedStatement stmt = connection.prepareStatement("insert into " + tableName + " values(?, ?, ?)");
+    stmt.setInt(1, id);
+    stmt.setString(2, email);
+    stmt.setString(3, password);
     executeSQLStatement(stmt);
   }
 
   /** Insert SQL Prepared statement for PLAYER_STATS * */
   public void insert(String tableName, Integer id, Integer xp, Integer cash) throws SQLException {
-    PreparedStatement stmt = connection.prepareStatement("insert into ? values(?, ?, ?)");
-    stmt.setString(1, tableName);
-    stmt.setInt(2, id);
-    stmt.setInt(3, xp);
-    stmt.setInt(4, cash);
+    PreparedStatement stmt = connection.prepareStatement("insert into " + tableName + " values(?, ?, ?)");
+    stmt.setInt(1, id);
+    stmt.setInt(2, xp);
+    stmt.setInt(3, cash);
     executeSQLStatement(stmt);
   }
 
   /** Insert SQL Prepared statement for GALLERY * */
   public void insert(String tableName, Integer id, Timestamp ts, Integer playerId, String url)
       throws SQLException {
-    PreparedStatement stmt = connection.prepareStatement("insert into ? values(?, ?, ?, ?)");
-    stmt.setString(1, tableName);
-    stmt.setInt(2, id);
-    stmt.setTimestamp(3, ts);
-    stmt.setInt(4, playerId);
-    stmt.setString(5, url);
+    PreparedStatement stmt = connection.prepareStatement("insert into " + tableName + " values(?, ?, ?, ?)");
+    stmt.setInt(1, id);
+    stmt.setTimestamp(2, ts);
+    stmt.setInt(3, playerId);
+    stmt.setString(4, url);
     executeSQLStatement(stmt);
   }
 
   /** Insert SQL Prepared statement for LOCATION * */
   public void insert(String tableName, Integer id, PGgeometry location) throws SQLException {
-    PreparedStatement stmt = connection.prepareStatement("insert into ? values(?, ?)");
-    stmt.setString(1, tableName);
-    stmt.setInt(2, id);
-    stmt.setObject(3, location);
+    PreparedStatement stmt = connection.prepareStatement("insert into " + tableName + " values(?, ?)");
+    stmt.setInt(1, id);
+    stmt.setObject(2, location);
     executeSQLStatement(stmt);
   }
 
@@ -133,27 +129,24 @@ public class QueryProcessor {
   public void insert(
       String tableName, Integer id, PGgeometry location, Integer type, String description)
       throws SQLException {
-    PreparedStatement stmt = connection.prepareStatement("insert into ? values(?, ?, ?, ?)");
-    stmt.setString(1, tableName);
-    stmt.setInt(2, id);
-    stmt.setObject(3, location);
-    stmt.setInt(4, type);
-    stmt.setString(5, description);
+    PreparedStatement stmt = connection.prepareStatement("insert into " + tableName + " values(?, ?, ?, ?)");
+    stmt.setInt(1, id);
+    stmt.setObject(2, location);
+    stmt.setInt(3, type);
+    stmt.setString(4, description);
     executeSQLStatement(stmt);
   }
 
   /** Insert SQL Prepared statement for LANDMARK_TYPE * */
   public void insert(String tableName, Integer id, String name) throws SQLException {
-    PreparedStatement stmt = connection.prepareStatement("insert into ? values(?, ?)");
-    stmt.setString(1, tableName);
-    stmt.setInt(2, id);
-    stmt.setString(3, name);
+    PreparedStatement stmt = connection.prepareStatement("insert into " + tableName + " values(?, ?)");
+    stmt.setInt(1, id);
+    stmt.setString(2, name);
     executeSQLStatement(stmt);
   }
 
   private void executeSQLStatement(PreparedStatement stmt) throws SQLException {
     stmt.executeUpdate();
-    stmt.close();
   }
 
   /**
