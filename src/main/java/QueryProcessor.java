@@ -83,77 +83,72 @@ public class QueryProcessor {
   }
 
   /**
-   * Method for Prepared INSERT SQL Statement * If table name not predefined query not attempted
+   * Methods for Prepared INSERT SQL Statements * Overloaded methods to support all possible types
+   * of values to be inserted into DB Each overloaded method is designed for a specific table
    *
-   * @param tableName
-   * @param values
-   * @throws SQLException
+   * Insert SQL Prepared statement for PLAYER *
    */
-  public void insertInto(String tableName, String... values) throws SQLException {
-    PreparedStatement stmt = null;
-    tableName = tableName.toUpperCase();
-    List<String> args = Arrays.asList(values);
-    boolean tableExists = true;
+  public void insert(String tableName, Integer id, String email, String password)
+      throws SQLException {
+    PreparedStatement stmt = connection.prepareStatement("insert into ? values(?, ?, ?)");
+    stmt.setString(1, tableName);
+    stmt.setInt(2, id);
+    stmt.setString(3, email);
+    stmt.setString(4, password);
+    executeSQLStatement(stmt);
+  }
 
-    switch (tableName) {
-      case "PLAYER":
-        {
-          stmt = connection.prepareStatement("insert into PLAYER values(?, ?, ?)");
-          stmt.setInt(1, Integer.parseInt(args.get(0)));
-          stmt.setString(2, args.get(1));
-          stmt.setString(3, args.get(2));
-          break;
-        }
-      case "PLAYER_STATS":
-        {
-          stmt = connection.prepareStatement("insert into PLAYER_STATS values(?, ?, ?)");
-          stmt.setInt(1, Integer.parseInt(args.get(0)));
-          stmt.setInt(2, Integer.parseInt(args.get(1)));
-          stmt.setInt(3, Integer.parseInt(args.get(2)));
-          break;
-        }
-      case "GALLERY":
-        {
-          stmt = connection.prepareStatement("insert into GALLERY values(?, ?, ?, ?)");
-          stmt.setInt(1, Integer.parseInt(args.get(0)));
-          stmt.setTimestamp(2, Timestamp.valueOf(args.get(1)));
-          stmt.setInt(3, Integer.parseInt(args.get(2)));
-          stmt.setString(4, args.get(3));
-          break;
-        }
-      case "LOCATION":
-        {
-          stmt = connection.prepareStatement("insert into LOCATION values(?, ?)");
-          stmt.setInt(1, Integer.parseInt(args.get(0)));
-          stmt.setObject(2, PGgeometry.geomFromString(args.get(1)));
-          break;
-        }
-      case "LANDMARK":
-        {
-          stmt = connection.prepareStatement("insert into LANDMARK values(?, ?, ?, ?)");
-          stmt.setInt(1, Integer.parseInt(args.get(0)));
-          stmt.setObject(2, PGgeometry.geomFromString(args.get(1)));
-          stmt.setInt(3, Integer.parseInt(args.get(2)));
-          stmt.setString(4, args.get(3));
-          break;
-        }
-      case "LANDMARK_TYPE":
-        {
-          stmt = connection.prepareStatement("insert into LANDMARK_TYPE values(?, ?)");
-          stmt.setInt(1, Integer.parseInt(args.get(0)));
-          stmt.setString(2, args.get(1));
-          break;
-        }
-      default:
-        {
-          System.out.println("Table " + tableName + " does not exist");
-          tableExists = false;
-        }
-    }
+  /** Insert SQL Prepared statement for PLAYER_STATS * */
+  public void insert(String tableName, Integer id, Integer xp, Integer cash) throws SQLException {
+    PreparedStatement stmt = connection.prepareStatement("insert into ? values(?, ?, ?)");
+    stmt.setString(1, tableName);
+    stmt.setInt(2, id);
+    stmt.setInt(3, xp);
+    stmt.setInt(4, cash);
+    executeSQLStatement(stmt);
+  }
 
-    if (tableExists) {
-      executeSQLStatement(stmt);
-    }
+  /** Insert SQL Prepared statement for GALLERY * */
+  public void insert(String tableName, Integer id, Timestamp ts, Integer playerId, String url)
+      throws SQLException {
+    PreparedStatement stmt = connection.prepareStatement("insert into ? values(?, ?, ?, ?)");
+    stmt.setString(1, tableName);
+    stmt.setInt(2, id);
+    stmt.setTimestamp(3, ts);
+    stmt.setInt(4, playerId);
+    stmt.setString(5, url);
+    executeSQLStatement(stmt);
+  }
+
+  /** Insert SQL Prepared statement for LOCATION * */
+  public void insert(String tableName, Integer id, PGgeometry location) throws SQLException {
+    PreparedStatement stmt = connection.prepareStatement("insert into ? values(?, ?)");
+    stmt.setString(1, tableName);
+    stmt.setInt(2, id);
+    stmt.setObject(3, location);
+    executeSQLStatement(stmt);
+  }
+
+  /** Insert SQL Prepared statement for LANDMARK * */
+  public void insert(
+      String tableName, Integer id, PGgeometry location, Integer type, String description)
+      throws SQLException {
+    PreparedStatement stmt = connection.prepareStatement("insert into ? values(?, ?, ?, ?)");
+    stmt.setString(1, tableName);
+    stmt.setInt(2, id);
+    stmt.setObject(3, location);
+    stmt.setInt(4, type);
+    stmt.setString(5, description);
+    executeSQLStatement(stmt);
+  }
+
+  /** Insert SQL Prepared statement for LANDMARK_TYPE * */
+  public void insert(String tableName, Integer id, String name) throws SQLException {
+    PreparedStatement stmt = connection.prepareStatement("insert into ? values(?, ?)");
+    stmt.setString(1, tableName);
+    stmt.setInt(2, id);
+    stmt.setString(3, name);
+    executeSQLStatement(stmt);
   }
 
   private void executeSQLStatement(PreparedStatement stmt) throws SQLException {
@@ -467,7 +462,7 @@ public class QueryProcessor {
    * @throws SQLException
    */
   private void setStandardUpdateParams(
-          PreparedStatement stmt, String table, String setParam, String whereParam)
+      PreparedStatement stmt, String table, String setParam, String whereParam)
       throws SQLException {
     stmt.setString(1, table);
     stmt.setString(2, setParam);

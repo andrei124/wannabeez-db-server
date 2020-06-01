@@ -19,103 +19,80 @@ public class QueryProcessorInsertTest {
   QueryProcessor queryProcessor = new QueryProcessor(mockJDBCconnection);
 
   @Test
-  public void insertIntoPlayerTableUpdatesDB() throws SQLException {
+  public void insertIntoPlayerTableParsedCorretly() throws SQLException {
 
     context.checking(
         new Expectations() {
           {
-            exactly(1)
-                .of(mockJDBCconnection)
-                .prepareStatement("insert into PLAYER values(?, ?, ?)");
+            exactly(1).of(mockJDBCconnection).prepareStatement("insert into ? values(?, ?, ?)");
           }
         });
 
-    queryProcessor.insertInto("Player", "100", "email", "password");
+    queryProcessor.insert("Player", 100, "email", "password");
   }
 
   @Test
-  public void insertIntoGalleryTableUpdatesDB() throws SQLException {
+  public void insertIntoGalleryTableParsedCorrectly() throws SQLException {
 
     context.checking(
         new Expectations() {
           {
-            exactly(1)
-                .of(mockJDBCconnection)
-                .prepareStatement("insert into GALLERY values(?, ?, ?, ?)");
+            exactly(1).of(mockJDBCconnection).prepareStatement("insert into ? values(?, ?, ?, ?)");
           }
         });
 
-    queryProcessor.insertInto("GalleRY", "1", exampleTS.toString(), "2", "Description");
+    queryProcessor.insert("GalleRY", 1, exampleTS, 2, "Description");
   }
 
   @Test
-  public void insertIntoPlayerStatsTableUpdatesDB() throws SQLException {
+  public void insertIntoPlayerStatsTableParsedCorrectly() throws SQLException {
 
     context.checking(
         new Expectations() {
           {
-            exactly(1)
-                .of(mockJDBCconnection)
-                .prepareStatement("insert into PLAYER_STATS values(?, ?, ?)");
+            exactly(1).of(mockJDBCconnection).prepareStatement("insert into ? values(?, ?, ?)");
           }
         });
 
-    queryProcessor.insertInto("player_STATS", "12", "102", "1236");
+    queryProcessor.insert("player_STATS", 12, 102, 1236);
   }
 
   @Test
-  public void insertIntoLocationTableUpdatesDB() throws SQLException {
+  public void insertIntoLocationTableParsedCorrectly() throws SQLException {
 
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("insert into LOCATION values(?, ?)");
+            exactly(1).of(mockJDBCconnection).prepareStatement("insert into ? values(?, ?)");
           }
         });
 
-    queryProcessor.insertInto("LOCATION", "1", examplePG.toString());
+    queryProcessor.insert("LOCATION", 1, examplePG);
   }
 
   @Test
-  public void insertIntoLandmarkTableUpdatesDB() throws SQLException {
+  public void insertIntoLandmarkTableParsedCorrectly() throws SQLException {
 
     context.checking(
         new Expectations() {
           {
-            exactly(1)
-                .of(mockJDBCconnection)
-                .prepareStatement("insert into LANDMARK values(?, ?, ?, ?)");
+            exactly(1).of(mockJDBCconnection).prepareStatement("insert into ? values(?, ?, ?, ?)");
           }
         });
 
-    queryProcessor.insertInto("LANDMARK", "1", examplePG.toString(), "6", "Example Landmark");
+    queryProcessor.insert("LANDMARK", 1, examplePG, 6, "Example Landmark");
   }
 
   @Test
-  public void insertIntoLandmarkTypeTableUpdatesDB() throws SQLException {
+  public void insertIntoLandmarkTypeTableParsedCorrectly() throws SQLException {
 
     context.checking(
         new Expectations() {
           {
-            exactly(1)
-                .of(mockJDBCconnection)
-                .prepareStatement("insert into LANDMARK_TYPE values(?, ?)");
+            exactly(1).of(mockJDBCconnection).prepareStatement("insert into ? values(?, ?)");
           }
         });
 
-    queryProcessor.insertInto("landmark_type", "1", "Example Landmark Type");
-  }
-
-  @Test
-  public void insertIntoInexistentTableDoesNotUpdateDB() throws SQLException {
-
-    context.checking(
-        new Expectations() {
-          {
-            never(mockJDBCconnection);
-          }
-        });
-
-    queryProcessor.insertInto("RANDOM_TABLE", "1231adadads", "ajshfjagh");
+    queryProcessor.insert("landmark_type", 1, "Example Landmark Type");
   }
 }
