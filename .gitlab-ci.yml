@@ -19,6 +19,6 @@ deploy:
     - mvn install
     - sh session.sh
   tags:
-    - production
-  only:
-    - master
+    - production-container
+#   only:
+#     - master
