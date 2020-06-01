@@ -23,7 +23,7 @@ public class QueryProcessorUpdateTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
+            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE Player SET email = ? WHERE password = ?");
           }
         });
     queryProcessor.update("Player", "email", "example@email.com", "password", "example123");
@@ -34,7 +34,7 @@ public class QueryProcessorUpdateTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
+            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE Player SET email = ? WHERE id = ?");
           }
         });
     queryProcessor.update("Player", "email", "example@email.com", "id", 123);
@@ -45,7 +45,7 @@ public class QueryProcessorUpdateTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
+            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE Gallery SET url = ? WHERE ts = ?");
           }
         });
     queryProcessor.update("Gallery", "url", "basicURL", "ts", exampleTS);
@@ -56,7 +56,7 @@ public class QueryProcessorUpdateTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
+            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE Landmark SET description = ? WHERE location = ?");
           }
         });
     queryProcessor.update("Landmark", "description", "Sample Description", "location", examplePG);
@@ -67,7 +67,7 @@ public class QueryProcessorUpdateTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
+            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE Player SET id = ? WHERE email = ?");
           }
         });
     queryProcessor.update("Player", "id", 20, "email", "example123@example.com");
@@ -78,7 +78,7 @@ public class QueryProcessorUpdateTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
+            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE Player_Stats SET xp = ? WHERE id = ?");
           }
         });
     queryProcessor.update("Player_Stats", "xp", 100, "id", 20);
@@ -89,7 +89,7 @@ public class QueryProcessorUpdateTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
+            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE Gallery SET player_id = ? WHERE ts = ?");
           }
         });
     queryProcessor.update("Gallery", "player_id", 1253, "ts", exampleTS);
@@ -100,7 +100,7 @@ public class QueryProcessorUpdateTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
+            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE Location SET id = ? WHERE location = ?");
           }
         });
     queryProcessor.update("Location", "id", 13618, "location", examplePG);
@@ -111,7 +111,7 @@ public class QueryProcessorUpdateTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
+            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE Gallery SET ts = ? WHERE url = ?");
           }
         });
     queryProcessor.update("Gallery", "ts", exampleTS, "url", "example_url");
@@ -122,7 +122,7 @@ public class QueryProcessorUpdateTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
+            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE Gallery SET ts = ? WHERE id = ?");
           }
         });
     queryProcessor.update("Gallery", "ts", exampleTS, "id", 1231);
@@ -133,7 +133,7 @@ public class QueryProcessorUpdateTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
+            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE Gallery SET ts = ? WHERE ts = ?");
           }
         });
     queryProcessor.update("Gallery", "ts", exampleTS, "ts", exampleTS);
@@ -151,7 +151,7 @@ public class QueryProcessorUpdateTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
+            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE MOCK_TABLE SET ts = ? WHERE location = ?");
           }
         });
     queryProcessor.update("MOCK_TABLE", "ts", exampleTS, "location", examplePG);
@@ -162,7 +162,7 @@ public class QueryProcessorUpdateTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
+            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE Landmark SET location = ? WHERE description = ?");
           }
         });
     queryProcessor.update("Landmark", "location", examplePG, "description", "Example Description");
@@ -173,7 +173,7 @@ public class QueryProcessorUpdateTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
+            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE Landmark SET location = ? WHERE id = ?");
           }
         });
     queryProcessor.update("Landmark", "location", examplePG, "id", 56);
@@ -192,7 +192,7 @@ public class QueryProcessorUpdateTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
+            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE MOCK_TABLE SET location = ? WHERE ts = ?");
           }
         });
     queryProcessor.update("MOCK_TABLE", "location", examplePG, "ts", exampleTS);
@@ -203,7 +203,7 @@ public class QueryProcessorUpdateTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
+            exactly(1).of(mockJDBCconnection).prepareStatement("UPDATE Landmark SET location = ? WHERE location = ?");
           }
         });
     queryProcessor.update("Landmark", "location", examplePG, "location", examplePG);
