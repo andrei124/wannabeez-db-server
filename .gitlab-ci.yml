@@ -13,10 +13,13 @@ test:
 
 deploy:
   stage: deploy
+  tags:
+    - production
   script:
-    - export DB_CONFIG="/home/usermcadmin/config.properties"
-    - mvn clean
-    - mvn install
-    - sh session.sh
+    - ls
+    # - export DB_CONFIG="/home/usermcadmin/config.properties"
+    # - mvn clean
+    # - mvn install
+    # - sh session.sh
 #   only:
 #     - master
