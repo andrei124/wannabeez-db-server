@@ -8,31 +8,31 @@ import java.util.concurrent.Executors;
 public class QuerySession {
 
   private static final int SERVER_PORT = 11234;
-  private static final int NUMBER_OF_THREADS = 16;
+  private static final int NUMBER_OF_THREADS = 2;
 
   public static void main(String[] args) throws SQLException {
 
-    System.out.println("SERVER STARTING...");
+    System.out.println("SERVER STARTED...");
 
-    ExecutorService executor = null;
+    ExecutorService executorService = null;
 
     try {
       ServerSocket serverSocket = new ServerSocket(SERVER_PORT);
-      executor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+      executorService = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
       while (true) {
         Socket clientSocket = serverSocket.accept();
         System.out.println("A client connected !!!!!!!");
         Runnable command = new RequestProcessor(clientSocket);
-        executor.execute(command);
+        executorService.execute(command);
       }
     } catch (IOException e) {
       System.out.println("Encountered exception when trying to listen for connections");
       System.out.println(e.getMessage());
       e.printStackTrace();
     } finally {
-      if (executor != null) {
-        executor.shutdown();
+      if (executorService != null) {
+        executorService.shutdown();
       }
     }
   }
