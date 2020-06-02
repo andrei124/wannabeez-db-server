@@ -6,29 +6,29 @@ import java.net.Socket;
 
 public class TestClient {
   private final String serverIP;
+  private Socket socket = null;
 
   public TestClient(String serverIP) {
     this.serverIP = serverIP;
   }
 
   public void connectToServer() throws IOException {
-    Socket socket = new Socket(serverIP, QuerySession.SERVER_PORT);
+    socket = new Socket(serverIP, QuerySession.SERVER_PORT);
     if (socket.isConnected()) {
-      sendJsonObject(socket);
       System.out.println("It connected");
     } else {
       System.out.println("It didn't connect");
     }
   }
 
-  private void sendJsonObject(Socket serverSocket) {
+  private void sendJsonObject(String jsonObject) {
     try {
       BufferedReader reader =
-          new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
-      PrintWriter writer = new PrintWriter(serverSocket.getOutputStream(), true);
+          new BufferedReader(new InputStreamReader(socket.getInputStream()));
+      PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
 
       System.out.println("I am trying to send a message.");
-      writer.println("message");
+      writer.println(jsonObject);
       System.out.println(reader.readLine());
 
     } catch (IOException e) {
@@ -37,6 +37,10 @@ public class TestClient {
   }
 
   public static void main(String[] args) throws IOException {
-    new TestClient("placeholder").connectToServer();
+    TestClient client = new TestClient("placehoooder");
+    client.connectToServer();
+    client.sendJsonObject("{"
+        + "\"id\": 123"
+        + "}");
   }
 }

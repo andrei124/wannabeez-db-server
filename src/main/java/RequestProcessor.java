@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import org.json.*;
 
 public class RequestProcessor implements Runnable {
 
@@ -25,13 +26,25 @@ public class RequestProcessor implements Runnable {
       String clientInput;
 
       while ((clientInput = reader.readLine()) != null) {
-        System.out.println(clientInput);
+        parseClientInput(clientInput);
         String result = "Result";
         writer.println(result);
       }
     } catch (IOException e) {
       System.out.println("IO Exception occurred when trying to open Input or Output stream");
       System.out.println(e.getMessage());
+    }
+  }
+
+  private void parseClientInput(String clientInput) {
+    System.out.println("Client input: " + clientInput);
+    try {
+      JSONObject obj = new JSONObject(clientInput);
+      int id = obj.getInt("id");
+      System.out.println("Item retrieved: id = " + id);
+    } catch (JSONException e) {
+      System.out.println("Parsed string is not json format");
+      e.printStackTrace();
     }
   }
 }
