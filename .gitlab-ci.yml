@@ -13,12 +13,11 @@ test:
 
 deploy:
   stage: deploy
-  script:
-    - export DB_CONFIG="/home/usermcadmin/config.properties"
-    - mvn clean
-    - mvn install
-    - sh session.sh
   tags:
     - production
-  only:
-    - master
+  script:
+    - cp ~/config.properties ./
+    - docker build --tag dbi .
+    - docker run dbi
+#   only:
+#     - master
