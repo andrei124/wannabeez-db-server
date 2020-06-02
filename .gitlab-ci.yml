@@ -16,6 +16,7 @@ deploy:
   tags:
     - production
   script:
+    - cp ~/config.properties ./
     - docker build --tag dbi .
     - docker run dbi
 #   only:
