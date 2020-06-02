@@ -1,4 +1,7 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 
 public class RequestProcessor implements Runnable {
@@ -13,12 +16,10 @@ public class RequestProcessor implements Runnable {
 
   @Override
   public void run() {
-    BufferedReader reader;
-    BufferedWriter writer;
-
     try {
-      reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-      writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+      BufferedReader reader =
+          new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+      PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
 
       System.out.println("Thread currently executing: " + Thread.currentThread().getName());
       String clientInput;
@@ -26,7 +27,7 @@ public class RequestProcessor implements Runnable {
       while ((clientInput = reader.readLine()) != null) {
         System.out.println(clientInput);
         String result = "Result";
-        writer.write(result);
+        writer.println(result);
       }
     } catch (IOException e) {
       System.out.println("IO Exception occurred when trying to open Input or Output stream");
