@@ -16,10 +16,7 @@ deploy:
   tags:
     - production
   script:
-    - ls
-    # - export DB_CONFIG="/home/usermcadmin/config.properties"
-    # - mvn clean
-    # - mvn install
-    # - sh session.sh
+    - docker build --tag dbi .
+    - docker run dbi
 #   only:
 #     - master
