@@ -3,12 +3,12 @@ import java.net.Socket;
 
 public class RequestProcessor implements Runnable {
 
-  private Socket clientSocket;
+  private final Socket clientSocket;
   private QueryProcessor queryProcessor;
 
   public RequestProcessor(Socket clientSocket) {
     this.clientSocket = clientSocket;
-    queryProcessor = new QueryProcessor();
+    this.queryProcessor = new QueryProcessor();
   }
 
   @Override
@@ -24,7 +24,7 @@ public class RequestProcessor implements Runnable {
       String clientInput;
 
       while ((clientInput = reader.readLine()) != null) {
-        /** TODO: Code to handle request */
+        System.out.println(clientInput);
         String result = "Result";
         writer.write(result);
       }
