@@ -25,10 +25,16 @@ public class QueryProcessorUpdateTest {
           {
             exactly(1)
                 .of(mockJDBCconnection)
-                .prepareStatement("UPDATE Player SET email = 'example@email.com' WHERE password = 'example123'");
+                .prepareStatement("UPDATE Player SET email = ? WHERE password = ?");
           }
         });
-    queryProcessor.update("Player").set("email").to("example@email.com").where("password").is("example123").execute();
+    queryProcessor
+        .update("Player")
+        .set("email")
+        .to("example@email.com")
+        .where("password")
+        .is("example123")
+        .execute();
   }
 
   @Test
@@ -38,10 +44,16 @@ public class QueryProcessorUpdateTest {
           {
             exactly(1)
                 .of(mockJDBCconnection)
-                .prepareStatement("UPDATE Player SET email = 'example@email.com' WHERE id = 123");
+                .prepareStatement("UPDATE Player SET email = ? WHERE id = ?");
           }
         });
-    queryProcessor.update("Player").set("email").to("example@email.com").where("id").is(123).execute();
+    queryProcessor
+        .update("Player")
+        .set("email")
+        .to("example@email.com")
+        .where("id")
+        .is(123)
+        .execute();
   }
 
   @Test
@@ -51,10 +63,16 @@ public class QueryProcessorUpdateTest {
           {
             exactly(1)
                 .of(mockJDBCconnection)
-                .prepareStatement("UPDATE Gallery SET url = 'example_url' WHERE ts = " + exampleTS.toString());
+                .prepareStatement("UPDATE Gallery SET url = ? WHERE ts = ?");
           }
         });
-    queryProcessor.update("Gallery").set("url").to("example_url").where("ts").is(exampleTS).execute();
+    queryProcessor
+        .update("Gallery")
+        .set("url")
+        .to("example_url")
+        .where("ts")
+        .is(exampleTS)
+        .execute();
   }
 
   @Test
@@ -64,10 +82,16 @@ public class QueryProcessorUpdateTest {
           {
             exactly(1)
                 .of(mockJDBCconnection)
-                .prepareStatement("UPDATE Landmark SET description = 'Sample Description' WHERE location = " + examplePG.toString());
+                .prepareStatement("UPDATE Landmark SET description = ? WHERE location = ?");
           }
         });
-    queryProcessor.update("Landmark").set("description").to("Sample Description").where("location").is(examplePG).execute();
+    queryProcessor
+        .update("Landmark")
+        .set("description")
+        .to("Sample Description")
+        .where("location")
+        .is(examplePG)
+        .execute();
   }
 
   @Test
@@ -80,7 +104,13 @@ public class QueryProcessorUpdateTest {
                 .prepareStatement("UPDATE Player SET id = ? WHERE email = ?");
           }
         });
-    queryProcessor.update("Player", "id", 20, "email", "example123@example.com");
+    queryProcessor
+        .update("Player")
+        .set("id")
+        .to(20)
+        .where("email")
+        .is("example123@example.com")
+        .execute();
   }
 
   @Test
@@ -93,7 +123,7 @@ public class QueryProcessorUpdateTest {
                 .prepareStatement("UPDATE Player_Stats SET xp = ? WHERE id = ?");
           }
         });
-    queryProcessor.update("Player_Stats", "xp", 100, "id", 20);
+    queryProcessor.update("Player_Stats").set("xp").to(100).where("id").is(20).execute();
   }
 
   @Test
@@ -106,7 +136,7 @@ public class QueryProcessorUpdateTest {
                 .prepareStatement("UPDATE Gallery SET player_id = ? WHERE ts = ?");
           }
         });
-    queryProcessor.update("Gallery", "player_id", 1253, "ts", exampleTS);
+    queryProcessor.update("Gallery").set("player_id").to(1253).where("ts").is(exampleTS);
   }
 
   @Test
@@ -119,7 +149,7 @@ public class QueryProcessorUpdateTest {
                 .prepareStatement("UPDATE Location SET id = ? WHERE location = ?");
           }
         });
-    queryProcessor.update("Location", "id", 13618, "location", examplePG);
+    queryProcessor.update("Location").set("id").to(13618).where("location").is(examplePG).execute();
   }
 
   @Test
@@ -132,7 +162,13 @@ public class QueryProcessorUpdateTest {
                 .prepareStatement("UPDATE Gallery SET ts = ? WHERE url = ?");
           }
         });
-    queryProcessor.update("Gallery", "ts", exampleTS, "url", "example_url");
+    queryProcessor
+        .update("Gallery")
+        .set("ts")
+        .to(exampleTS)
+        .where("url")
+        .is("example_url")
+        .execute();
   }
 
   @Test
@@ -145,7 +181,7 @@ public class QueryProcessorUpdateTest {
                 .prepareStatement("UPDATE Gallery SET ts = ? WHERE id = ?");
           }
         });
-    queryProcessor.update("Gallery", "ts", exampleTS, "id", 1231);
+    queryProcessor.update("Gallery").set("ts").to(exampleTS).where("id").is(1231).execute();
   }
 
   @Test
@@ -158,27 +194,7 @@ public class QueryProcessorUpdateTest {
                 .prepareStatement("UPDATE Gallery SET ts = ? WHERE ts = ?");
           }
         });
-    queryProcessor.update("Gallery", "ts", exampleTS, "ts", exampleTS);
-  }
-
-  /**
-   * Test performed on a MOCK_TABLE since the combination (setValue, whereValue) = (Timestamp,
-   * PGeometry) does not currently exists in any of our actual DB Created for potential extension of
-   * our DB requirements and for Unit Testing only
-   *
-   * @throws SQLException
-   */
-  @Test
-  public void updateSetTimestampWherePGeometryHandledCorrectly() throws SQLException {
-    context.checking(
-        new Expectations() {
-          {
-            exactly(1)
-                .of(mockJDBCconnection)
-                .prepareStatement("UPDATE MOCK_TABLE SET ts = ? WHERE location = ?");
-          }
-        });
-    queryProcessor.update("MOCK_TABLE", "ts", exampleTS, "location", examplePG);
+    queryProcessor.update("Gallery").set("ts").to(exampleTS).where("ts").is(exampleTS);
   }
 
   @Test
@@ -191,7 +207,13 @@ public class QueryProcessorUpdateTest {
                 .prepareStatement("UPDATE Landmark SET location = ? WHERE description = ?");
           }
         });
-    queryProcessor.update("Landmark", "location", examplePG, "description", "Example Description");
+    queryProcessor
+        .update("Landmark")
+        .set("location")
+        .to(examplePG)
+        .where("description")
+        .is("Example Description")
+        .execute();
   }
 
   @Test
@@ -204,27 +226,7 @@ public class QueryProcessorUpdateTest {
                 .prepareStatement("UPDATE Landmark SET location = ? WHERE id = ?");
           }
         });
-    queryProcessor.update("Landmark", "location", examplePG, "id", 56);
-  }
-
-  /**
-   * Test performed on a MOCK_TABLE since the combination (setValue, whereValue) = (PGeometry,
-   * Timestamp) does not currently exists in any of our actual DB Created for potential extension of
-   * our DB requirements and for Unit Testing only
-   *
-   * @throws SQLException
-   */
-  @Test
-  public void updateSetPGeometryWhereTimestampHandledCorrectly() throws SQLException {
-    context.checking(
-        new Expectations() {
-          {
-            exactly(1)
-                .of(mockJDBCconnection)
-                .prepareStatement("UPDATE MOCK_TABLE SET location = ? WHERE ts = ?");
-          }
-        });
-    queryProcessor.update("MOCK_TABLE", "location", examplePG, "ts", exampleTS);
+    queryProcessor.update("Landmark").set("location").to(examplePG).where("id").is(56).execute();
   }
 
   @Test
@@ -237,6 +239,12 @@ public class QueryProcessorUpdateTest {
                 .prepareStatement("UPDATE Landmark SET location = ? WHERE location = ?");
           }
         });
-    queryProcessor.update("Landmark", "location", examplePG, "location", examplePG);
+    queryProcessor
+        .update("Landmark")
+        .set("location")
+        .to(examplePG)
+        .where("location")
+        .is(examplePG)
+        .execute();
   }
 }

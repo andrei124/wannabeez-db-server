@@ -60,9 +60,7 @@ public class QueryProcessorDeleteTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1)
-                .of(mockJDBCconnection)
-                .prepareStatement("DELETE FROM Gallery WHERE ts = ?");
+            exactly(1).of(mockJDBCconnection).prepareStatement("DELETE FROM Gallery WHERE ts = ?");
           }
         });
     queryProcessor.delete().from("Gallery").where("ts").is(exampleTS).execute();

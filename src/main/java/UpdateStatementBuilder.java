@@ -6,70 +6,92 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 
 public class UpdateStatementBuilder {
-    private StringBuilder sqlUpdateStatement;
-    private String table;
-    private Connection connection;
 
-    public UpdateStatementBuilder(Connection connection, String table) {
-        this.table = table;
-        this.connection = connection;
-        sqlUpdateStatement = new StringBuilder();
-        sqlUpdateStatement.append("UPDATE ").append(table);
-    }
+  private StringBuilder sqlUpdateStatement = new StringBuilder();
+  private String table;
+  private PreparedStatement stmt = null;
+  private Connection connection;
 
-    public UpdateStatementBuilder set(String column) {
-        sqlUpdateStatement.append(" SET ").append(column).append(" = ");
-        return this;
-    }
+  private String toString = null;
+  private Integer toInt = null;
+  private Timestamp toTimestamp = null;
+  private PGgeometry toPGeometry = null;
 
-    public UpdateStatementBuilder to(String value) {
-        sqlUpdateStatement.append("'").append(value).append("'");
-        return this;
-    }
+  public UpdateStatementBuilder(Connection connection, String table) {
+    this.table = table;
+    this.connection = connection;
+    sqlUpdateStatement.append("UPDATE ").append(table);
+  }
 
-    public UpdateStatementBuilder to(Integer value) {
-        sqlUpdateStatement.append(value);
-        return this;
-    }
+  public UpdateStatementBuilder set(String column) {
+    sqlUpdateStatement.append(" SET ").append(column).append(" = ?");
+    return this;
+  }
 
-    public UpdateStatementBuilder to(Timestamp value) {
-        sqlUpdateStatement.append(value);
-        return this;
-    }
+  public UpdateStatementBuilder to(String value) {
+    toString = value;
+    return this;
+  }
 
-    public UpdateStatementBuilder to(PGgeometry value) {
-        sqlUpdateStatement.append(value);
-        return this;
-    }
+  public UpdateStatementBuilder to(Integer value) {
+    toInt = value;
+    return this;
+  }
 
-    public UpdateStatementBuilder where(String whereParam) {
-        sqlUpdateStatement.append(" WHERE ").append(whereParam).append(" = ");
-        return this;
-    }
+  public UpdateStatementBuilder to(Timestamp value) {
+    toTimestamp = value;
+    return this;
+  }
 
-    public UpdateStatementBuilder is(String value) {
-        sqlUpdateStatement.append("'").append(value).append("'");
-        return this;
-    }
+  public UpdateStatementBuilder to(PGgeometry value) {
+    toPGeometry = value;
+    return this;
+  }
 
-    public UpdateStatementBuilder is(Integer value) {
-        sqlUpdateStatement.append(value);
-        return this;
-    }
+  public UpdateStatementBuilder where(String whereParam) throws SQLException {
+    sqlUpdateStatement.append(" WHERE ").append(whereParam).append(" = ?");
+    stmt = connection.prepareStatement(sqlUpdateStatement.toString());
+    return this;
+  }
 
-    public UpdateStatementBuilder is(Timestamp value) {
-        sqlUpdateStatement.append(value);
-        return this;
-    }
+  public UpdateStatementBuilder is(String value) throws SQLException {
+    setFirstStatementParam();
+    stmt.setString(2, value);
+    return this;
+  }
 
-    public UpdateStatementBuilder is(PGgeometry value) {
-        sqlUpdateStatement.append(value);
-        return this;
-    }
+  public UpdateStatementBuilder is(Integer value) throws SQLException {
+    setFirstStatementParam();
+    stmt.setInt(2, value);
+    return this;
+  }
 
-    public void execute() throws SQLException {
-        System.out.println("The update statement is:   " + sqlUpdateStatement.toString());
-        PreparedStatement stmt = connection.prepareStatement(sqlUpdateStatement.toString());
-        QueryHelpers.executeSQLStatement(stmt);
+  public UpdateStatementBuilder is(Timestamp value) throws SQLException {
+    setFirstStatementParam();
+    stmt.setTimestamp(2, value);
+    return this;
+  }
+
+  public UpdateStatementBuilder is(PGgeometry value) throws SQLException {
+    setFirstStatementParam();
+    stmt.setObject(2, value);
+    return this;
+  }
+
+  public void execute() throws SQLException {
+    System.out.println("The update statement is:   " + sqlUpdateStatement.toString());
+    QueryHelpers.executeSQLStatement(stmt);
+  }
+
+  private void setFirstStatementParam() throws SQLException {
+    if (toString != null) {
+      stmt.setString(1, toString);
+    } else if (toInt != null) {
+      stmt.setInt(1, toInt);
+    } else if (toTimestamp != null) {
+      stmt.setTimestamp(1, toTimestamp);
+    } else if (toPGeometry != null) {
+      stmt.setObject(1, toPGeometry);
     }
+  }
 }

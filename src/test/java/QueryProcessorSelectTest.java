@@ -48,8 +48,7 @@ public class QueryProcessorSelectTest {
           {
             exactly(1)
                 .of(mockJDBCconnection)
-                .prepareStatement(
-                    "SELECT id FROM Location WHERE location = ?");
+                .prepareStatement("SELECT id FROM Location WHERE location = ?");
           }
         });
     queryProcessor.select("id").from("Location").where("location").is(examplePG).execute();
@@ -62,8 +61,7 @@ public class QueryProcessorSelectTest {
           {
             exactly(1)
                 .of(mockJDBCconnection)
-                .prepareStatement(
-                    "SELECT player_id,url FROM Gallery WHERE ts = ?");
+                .prepareStatement("SELECT player_id,url FROM Gallery WHERE ts = ?");
           }
         });
     queryProcessor.select("player_id,url").from("Gallery").where("ts").is(exampleTS).execute();
