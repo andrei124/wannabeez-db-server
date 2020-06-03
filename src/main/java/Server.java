@@ -5,8 +5,15 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Server {
+
+  private static final String METHOD_NOT_FOUND = "method not found";
+  private static final String SUCCESS = "success";
+  private static final String BAD_PARAMS = "bad parameters";
+  private static final String DATABASE_ERROR = "database error";
 
   private final QueryProcessor queryProcessor;
   private final HttpServer httpServer;
@@ -23,14 +30,35 @@ public class Server {
   }
 
   public void start() {
+    this.queryProcessor.connect();
     this.httpServer.start();
     System.out.println("Server started");
   }
 
   private static void handleInsert(HttpExchange exchange) throws IOException {
+    // extract info from request
     URI requestURI = exchange.getRequestURI();
-    printRequestInfo(exchange);
-    String response = "This is the response at " + requestURI;
+    String method = requestURI.getPath().replace("/insert/", "");
+    Map<String, String> params = parseQuery(requestURI.getQuery());
+
+    String response = METHOD_NOT_FOUND;
+    try {
+      // check which method is being used
+      switch (method) {
+        case "gallery":
+          System.out.println("gallery insertion");
+          //TODO: QUERYPROCESSOR GALLERY SHIT
+          // SOMETHING LIKE THIS : this.queryProcessor.insert("gallery", .....);
+          safeMapLookup(params, "asdfasdf");
+          response = SUCCESS;
+          break;
+      }
+    } catch (KeyNotFoundException e) {
+      // catch missing params
+      response = BAD_PARAMS;
+    }
+
+    // send response
     exchange.sendResponseHeaders(200, response.getBytes().length);
     OutputStream os = exchange.getResponseBody();
     os.write(response.getBytes());
@@ -38,9 +66,27 @@ public class Server {
   }
 
   private static void handleSelect(HttpExchange exchange) throws IOException {
+    // extract info from request
     URI requestURI = exchange.getRequestURI();
-    printRequestInfo(exchange);
-    String response = "This is the response at " + requestURI;
+    String method = requestURI.getPath().replace("/insert/", "");
+    Map<String, String> params = parseQuery(requestURI.getQuery());
+
+    String response = METHOD_NOT_FOUND;
+    try {
+      // check which method is being used
+      switch (method) {
+        case "gallery":
+          System.out.println("gallery select");
+          safeMapLookup(params, "asdfasdf");
+          response = SUCCESS;
+          break;
+      }
+    } catch (KeyNotFoundException e) {
+      // catch missing params
+      response = BAD_PARAMS;
+    }
+
+    // send response
     exchange.sendResponseHeaders(200, response.getBytes().length);
     OutputStream os = exchange.getResponseBody();
     os.write(response.getBytes());
@@ -48,32 +94,49 @@ public class Server {
   }
 
   private static void handleUpdate(HttpExchange exchange) throws IOException {
+    // extract info from request
     URI requestURI = exchange.getRequestURI();
-    printRequestInfo(exchange);
-    String response = "This is the response at " + requestURI;
+    String method = requestURI.getPath().replace("/insert/", "");
+    Map<String, String> params = parseQuery(requestURI.getQuery());
+
+    String response = METHOD_NOT_FOUND;
+    try {
+      // check which method is being used
+      switch (method) {
+        case "gallery":
+          System.out.println("gallery update");
+          safeMapLookup(params, "asdfasdf");
+          response = SUCCESS;
+          break;
+      }
+    } catch (KeyNotFoundException e) {
+      // catch missing params
+      response = BAD_PARAMS;
+    }
+
+    // send response
     exchange.sendResponseHeaders(200, response.getBytes().length);
     OutputStream os = exchange.getResponseBody();
     os.write(response.getBytes());
     os.close();
   }
 
-  private static void printRequestInfo(HttpExchange exchange) {
-    System.out.println("-- headers --");
-    Headers requestHeaders = exchange.getRequestHeaders();
-    requestHeaders.entrySet().forEach(System.out::println);
+  public static Map<String, String> parseQuery(String url) {
+    Map<String, String> queryPairs = new HashMap<>();
+    if (url != null) {
+      String[] pairs = url.split("&");
+      for (String pair : pairs) {
+        int idx = pair.indexOf("=");
+        queryPairs.put(pair.substring(0, idx), pair.substring(idx + 1));
+      }
+    }
+    return queryPairs;
+  }
 
-    System.out.println("-- principle --");
-    HttpPrincipal principal = exchange.getPrincipal();
-    System.out.println(principal);
-
-    System.out.println("-- HTTP method --");
-    String requestMethod = exchange.getRequestMethod();
-    System.out.println(requestMethod);
-
-    System.out.println("-- query --");
-    URI requestURI = exchange.getRequestURI();
-    String query = requestURI.getQuery();
-    System.out.println(query);
+  public static String safeMapLookup(Map<String, String> map, String key) throws KeyNotFoundException{
+    if (map.get(key) == null)
+      throw new KeyNotFoundException();
+    return map.get(key);
   }
 
 }
