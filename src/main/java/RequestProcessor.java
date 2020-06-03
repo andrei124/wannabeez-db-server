@@ -11,10 +11,9 @@ public class RequestProcessor implements Runnable {
   private final Socket clientSocket;
   private final QueryProcessor queryProcessor;
 
-  public RequestProcessor(Socket clientSocket, QueryProcessor queryProcessor, HttpExchange exchange) {
+  public RequestProcessor(Socket clientSocket, QueryProcessor queryProcessor) {
     this.clientSocket = clientSocket;
     this.queryProcessor = queryProcessor;
-    this.exchange = exchange;
   }
 
   @Override
