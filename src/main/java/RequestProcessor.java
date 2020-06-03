@@ -4,15 +4,20 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import org.json.*;
+import com.sun.net.httpserver.HttpExchange;
+
+import javax.management.Query;
 
 public class RequestProcessor implements Runnable {
 
   private final Socket clientSocket;
-  private QueryProcessor queryProcessor;
+  private final QueryProcessor queryProcessor;
+  private final HttpExchange exchange;
 
-  public RequestProcessor(Socket clientSocket) {
+  public RequestProcessor(Socket clientSocket, QueryProcessor queryProcessor, HttpExchange exchange) {
     this.clientSocket = clientSocket;
-    this.queryProcessor = new QueryProcessor();
+    this.queryProcessor = queryProcessor;
+    this.exchange = exchange;
   }
 
   @Override
