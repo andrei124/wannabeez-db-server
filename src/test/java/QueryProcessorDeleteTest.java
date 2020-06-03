@@ -36,7 +36,7 @@ public class QueryProcessorDeleteTest {
           {
             exactly(1)
                 .of(mockJDBCconnection)
-                .prepareStatement("DELETE FROM Player WHERE email = 'example@email.com'");
+                .prepareStatement("DELETE FROM Player WHERE email = ?");
           }
         });
     queryProcessor.delete().from("Player").where("email").is("example@email.com").execute();
@@ -49,7 +49,7 @@ public class QueryProcessorDeleteTest {
           {
             exactly(1)
                 .of(mockJDBCconnection)
-                .prepareStatement("DELETE FROM Landmark_Type WHERE id = 7");
+                .prepareStatement("DELETE FROM Landmark_Type WHERE id = ?");
           }
         });
     queryProcessor.delete().from("Landmark_Type").where("id").is(7).execute();
@@ -62,7 +62,7 @@ public class QueryProcessorDeleteTest {
           {
             exactly(1)
                 .of(mockJDBCconnection)
-                .prepareStatement("DELETE FROM Gallery WHERE ts = " + exampleTS.toString());
+                .prepareStatement("DELETE FROM Gallery WHERE ts = ?");
           }
         });
     queryProcessor.delete().from("Gallery").where("ts").is(exampleTS).execute();
@@ -75,7 +75,7 @@ public class QueryProcessorDeleteTest {
           {
             exactly(1)
                 .of(mockJDBCconnection)
-                .prepareStatement("DELETE FROM Location WHERE location = " + examplePG.toString());
+                .prepareStatement("DELETE FROM Location WHERE location = ?");
           }
         });
     queryProcessor.delete().from("Location").where("location").is(examplePG).execute();

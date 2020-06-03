@@ -6,12 +6,12 @@ import java.sql.Timestamp;
 
 public class DeleteStatementBuilder {
 
-  private StringBuilder sqlDeleteStatement;
+  private StringBuilder sqlDeleteStatement = new StringBuilder();
+  private PreparedStatement stmt = null;
   private Connection connection;
 
   public DeleteStatementBuilder(Connection connection) {
     this.connection = connection;
-    sqlDeleteStatement = new StringBuilder();
     sqlDeleteStatement.append("DELETE ");
   }
 
@@ -20,33 +20,36 @@ public class DeleteStatementBuilder {
     return this;
   }
 
-  public DeleteStatementBuilder where(String whereParam) {
-    sqlDeleteStatement.append(" WHERE ").append(whereParam).append(" = ");
+  public DeleteStatementBuilder where(String whereParam) throws SQLException {
+    sqlDeleteStatement.append(" WHERE ").append(whereParam).append(" = ?");
+    stmt = connection.prepareStatement(sqlDeleteStatement.toString());
     return this;
   }
 
-  public DeleteStatementBuilder is(String value) {
-    sqlDeleteStatement.append("'").append(value).append("'");
+  public DeleteStatementBuilder is(String value) throws SQLException {
+    stmt.setString(1, value);
     return this;
   }
 
-  public DeleteStatementBuilder is(Integer value) {
-    sqlDeleteStatement.append(value);
+  public DeleteStatementBuilder is(Integer value) throws SQLException {
+    stmt.setInt(1, value);
     return this;
   }
 
-  public DeleteStatementBuilder is(Timestamp value) {
-    sqlDeleteStatement.append(value);
+  public DeleteStatementBuilder is(Timestamp value) throws SQLException {
+    stmt.setTimestamp(1, value);
     return this;
   }
 
-  public DeleteStatementBuilder is(PGgeometry value) {
-    sqlDeleteStatement.append(value);
+  public DeleteStatementBuilder is(PGgeometry value) throws SQLException {
+    stmt.setObject(1, value);
     return this;
   }
 
   public void execute() throws SQLException {
-    PreparedStatement stmt = connection.prepareStatement(sqlDeleteStatement.toString());
+    if (!sqlDeleteStatement.toString().contains("WHERE")) {
+      stmt = connection.prepareStatement(sqlDeleteStatement.toString());
+    }
     QueryHelpers.executeSQLStatement(stmt);
   }
 }

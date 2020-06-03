@@ -3,13 +3,12 @@ import java.sql.*;
 
 public class SelectQueryBuilder {
 
-  private StringBuilder sqlSelectQuery;
+  private StringBuilder sqlSelectQuery = new StringBuilder();
+  private PreparedStatement stmt = null;
   private Connection connection;
-  private PreparedStatement stmt;
 
   public SelectQueryBuilder(Connection connection, String... columns) {
     this.connection = connection;
-    sqlSelectQuery = new StringBuilder();
     sqlSelectQuery
         .append("SELECT ")
         .append(QueryHelpers.getColumnsToBeQueried(columns))
