@@ -19,5 +19,5 @@ deploy:
     - cp ~/config.properties ./
     - docker build --tag dbi .
     - docker run dbi
-#   only:
-#     - master
+  only:
+    - master
