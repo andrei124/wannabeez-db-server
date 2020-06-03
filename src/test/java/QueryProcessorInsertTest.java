@@ -26,11 +26,12 @@ public class QueryProcessorInsertTest {
           {
             exactly(1)
                 .of(mockJDBCconnection)
-                .prepareStatement("insert into Player values(?, ?, ?)");
+                .prepareStatement(
+                    "insert into Player" + " (\"email\", \"password\") " + " values(?, ?)");
           }
         });
 
-    queryProcessor.insert("Player", 100, "email", "password");
+    queryProcessor.insertIntoPlayer("email", "password");
   }
 
   @Test
@@ -41,11 +42,14 @@ public class QueryProcessorInsertTest {
           {
             exactly(1)
                 .of(mockJDBCconnection)
-                .prepareStatement("insert into Gallery values(?, ?, ?, ?)");
+                .prepareStatement(
+                    "insert into Gallery"
+                        + " (\"ts\", \"player_id\", \"url\") "
+                        + " values(?, ?, ?)");
           }
         });
 
-    queryProcessor.insert("Gallery", 1, exampleTS, 2, "Description");
+    queryProcessor.insertIntoGallery(exampleTS, 2, "Description");
   }
 
   @Test
@@ -60,7 +64,7 @@ public class QueryProcessorInsertTest {
           }
         });
 
-    queryProcessor.insert("Player_Stats", 12, 102, 1236);
+    queryProcessor.insertIntoPlayerStats(12, 102, 1236);
   }
 
   @Test
@@ -69,11 +73,11 @@ public class QueryProcessorInsertTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("insert into LOCATION values(?, ?)");
+            exactly(1).of(mockJDBCconnection).prepareStatement("insert into Location values(?, ?)");
           }
         });
 
-    queryProcessor.insert("LOCATION", 1, examplePG);
+    queryProcessor.insertIntoLocation(1, examplePG);
   }
 
   @Test
@@ -84,11 +88,14 @@ public class QueryProcessorInsertTest {
           {
             exactly(1)
                 .of(mockJDBCconnection)
-                .prepareStatement("insert into LANDMARK values(?, ?, ?, ?)");
+                .prepareStatement(
+                    "insert into Landmark"
+                        + " (\"location\", \"type\", \"description\") "
+                        + " values(?, ?, ?)");
           }
         });
 
-    queryProcessor.insert("LANDMARK", 1, examplePG, 6, "Example Landmark");
+    queryProcessor.insertIntoLandmark(examplePG, 6, "Example Landmark");
   }
 
   @Test
@@ -99,10 +106,10 @@ public class QueryProcessorInsertTest {
           {
             exactly(1)
                 .of(mockJDBCconnection)
-                .prepareStatement("insert into landmark_type values(?, ?)");
+                .prepareStatement("insert into Landmark_Type" + " (\"name\") " + " values(?)");
           }
         });
 
-    queryProcessor.insert("landmark_type", 1, "Example Landmark Type");
+    queryProcessor.insertIntoLandmarkType("Example Landmark Type");
   }
 }

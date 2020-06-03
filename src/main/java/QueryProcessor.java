@@ -1,12 +1,7 @@
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -96,66 +91,93 @@ public class QueryProcessor {
    *
    * <p>Insert SQL Prepared statement for PLAYER *
    */
-  public void insert(String tableName, Integer id, String email, String password)
-      throws SQLException {
+  public void insertIntoPlayer(String email, String password) throws SQLException {
+    insert("Player", email, password);
+  }
+
+  private void insert(String tableName, String email, String password) throws SQLException {
     PreparedStatement stmt =
-        connection.prepareStatement("insert into " + tableName + " values(?, ?, ?)");
-    stmt.setInt(1, id);
-    stmt.setString(2, email);
-    stmt.setString(3, password);
+        connection.prepareStatement(
+            "insert into " + tableName + " (\"email\", \"password\") " + " values(?, ?)");
+    stmt.setString(1, email);
+    stmt.setString(2, password);
     executeSQLStatement(stmt);
   }
 
   /** Insert SQL Prepared statement for PLAYER_STATS * */
-  public void insert(String tableName, Integer id, Integer xp, Integer cash) throws SQLException {
+  public void insertIntoPlayerStats(Integer player_id, Integer xp, Integer cash)
+      throws SQLException {
+    insert("Player_Stats", player_id, xp, cash);
+  }
+
+  private void insert(String tableName, Integer player_id, Integer xp, Integer cash)
+      throws SQLException {
     PreparedStatement stmt =
         connection.prepareStatement("insert into " + tableName + " values(?, ?, ?)");
-    stmt.setInt(1, id);
+    stmt.setInt(1, player_id);
     stmt.setInt(2, xp);
     stmt.setInt(3, cash);
     executeSQLStatement(stmt);
   }
 
   /** Insert SQL Prepared statement for GALLERY * */
-  public void insert(String tableName, Integer id, Timestamp ts, Integer playerId, String url)
+  public void insertIntoGallery(Timestamp ts, Integer playerId, String url) throws SQLException {
+    insert("Gallery", ts, playerId, url);
+  }
+
+  private void insert(String tableName, Timestamp ts, Integer playerId, String url)
       throws SQLException {
     PreparedStatement stmt =
-        connection.prepareStatement("insert into " + tableName + " values(?, ?, ?, ?)");
-    stmt.setInt(1, id);
-    stmt.setTimestamp(2, ts);
-    stmt.setInt(3, playerId);
-    stmt.setString(4, url);
+        connection.prepareStatement(
+            "insert into " + tableName + " (\"ts\", \"player_id\", \"url\") " + " values(?, ?, ?)");
+    stmt.setTimestamp(1, ts);
+    stmt.setInt(2, playerId);
+    stmt.setString(3, url);
     executeSQLStatement(stmt);
   }
 
   /** Insert SQL Prepared statement for LOCATION * */
-  public void insert(String tableName, Integer id, PGgeometry location) throws SQLException {
+  public void insertIntoLocation(Integer imageId, PGgeometry location) throws SQLException {
+    insert("Location", imageId, location);
+  }
+
+  private void insert(String tableName, Integer imageId, PGgeometry location) throws SQLException {
     PreparedStatement stmt =
         connection.prepareStatement("insert into " + tableName + " values(?, ?)");
-    stmt.setInt(1, id);
+    stmt.setInt(1, imageId);
     stmt.setObject(2, location);
     executeSQLStatement(stmt);
   }
 
   /** Insert SQL Prepared statement for LANDMARK * */
-  public void insert(
-      String tableName, Integer id, PGgeometry location, Integer type, String description)
+  public void insertIntoLandmark(PGgeometry location, Integer type, String description)
+      throws SQLException {
+    insert("Landmark", location, type, description);
+  }
+
+  private void insert(String tableName, PGgeometry location, Integer type, String description)
       throws SQLException {
     PreparedStatement stmt =
-        connection.prepareStatement("insert into " + tableName + " values(?, ?, ?, ?)");
-    stmt.setInt(1, id);
-    stmt.setObject(2, location);
-    stmt.setInt(3, type);
-    stmt.setString(4, description);
+        connection.prepareStatement(
+            "insert into "
+                + tableName
+                + " (\"location\", \"type\", \"description\") "
+                + " values(?, ?, ?)");
+    stmt.setObject(1, location);
+    stmt.setInt(2, type);
+    stmt.setString(3, description);
     executeSQLStatement(stmt);
   }
 
   /** Insert SQL Prepared statement for LANDMARK_TYPE * */
-  public void insert(String tableName, Integer id, String name) throws SQLException {
+  public void insertIntoLandmarkType(String name) throws SQLException {
+    insert("Landmark_Type", name);
+  }
+
+  private void insert(String tableName, String name) throws SQLException {
     PreparedStatement stmt =
-        connection.prepareStatement("insert into " + tableName + " values(?, ?)");
-    stmt.setInt(1, id);
-    stmt.setString(2, name);
+        connection.prepareStatement("insert into " + tableName + " (\"name\") " + " values(?)");
+    stmt.setString(1, name);
     executeSQLStatement(stmt);
   }
 
