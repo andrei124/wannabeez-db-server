@@ -26,7 +26,7 @@ public class QueryProcessorDeleteTest {
             exactly(1).of(mockJDBCconnection).prepareStatement("DELETE FROM Player");
           }
         });
-    queryProcessor.deleteFrom("Player");
+    queryProcessor.delete().from("Player").execute();
   }
 
   @Test
@@ -36,10 +36,10 @@ public class QueryProcessorDeleteTest {
           {
             exactly(1)
                 .of(mockJDBCconnection)
-                .prepareStatement("DELETE FROM Player WHERE email = ?");
+                .prepareStatement("DELETE FROM Player WHERE email = example@email.com");
           }
         });
-    queryProcessor.deleteFromWhere("Player", "email", "example@email.com");
+    queryProcessor.delete().from("Player").where("email").is("example@email.com").execute();
   }
 
   @Test
@@ -49,10 +49,10 @@ public class QueryProcessorDeleteTest {
           {
             exactly(1)
                 .of(mockJDBCconnection)
-                .prepareStatement("DELETE FROM Landmark_Type WHERE id = ?");
+                .prepareStatement("DELETE FROM Landmark_Type WHERE id = 7");
           }
         });
-    queryProcessor.deleteFromWhere("Landmark_Type", "id", 7);
+    queryProcessor.delete().from("Landmark_Type").where("id").is(7).execute();
   }
 
   @Test
@@ -60,10 +60,12 @@ public class QueryProcessorDeleteTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("DELETE FROM Gallery WHERE ts = ?");
+            exactly(1)
+                .of(mockJDBCconnection)
+                .prepareStatement("DELETE FROM Gallery WHERE ts = " + exampleTS.toString());
           }
         });
-    queryProcessor.deleteFromWhere("Gallery", "ts", exampleTS);
+    queryProcessor.delete().from("Gallery").where("ts").is(exampleTS).execute();
   }
 
   @Test
@@ -73,9 +75,9 @@ public class QueryProcessorDeleteTest {
           {
             exactly(1)
                 .of(mockJDBCconnection)
-                .prepareStatement("DELETE FROM Location WHERE location = ?");
+                .prepareStatement("DELETE FROM Location WHERE location = " + examplePG.toString());
           }
         });
-    queryProcessor.deleteFromWhere("Location", "location", examplePG);
+    queryProcessor.delete().from("Location").where("location").is(examplePG).execute();
   }
 }
