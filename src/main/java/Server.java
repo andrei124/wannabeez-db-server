@@ -18,7 +18,7 @@ public class Server {
     insertContext.setHandler(Server::handleInsert);
     HttpContext selectContext = this.httpServer.createContext("/select");
     selectContext.setHandler(Server::handleSelect);
-    HttpContext updateContext = this.httpServer.createContext("/select");
+    HttpContext updateContext = this.httpServer.createContext("/update");
     updateContext.setHandler(Server::handleUpdate);
   }
 

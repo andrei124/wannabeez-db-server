@@ -6,8 +6,6 @@ import java.net.Socket;
 import org.json.*;
 import com.sun.net.httpserver.HttpExchange;
 
-import javax.management.Query;
-
 public class RequestProcessor implements Runnable {
 
   private final Socket clientSocket;
