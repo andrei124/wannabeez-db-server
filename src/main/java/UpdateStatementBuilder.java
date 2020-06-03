@@ -1,5 +1,4 @@
 import org.postgis.PGgeometry;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -8,7 +7,6 @@ import java.sql.Timestamp;
 public class UpdateStatementBuilder {
 
   private StringBuilder sqlUpdateStatement = new StringBuilder();
-  private String table;
   private PreparedStatement stmt = null;
   private Connection connection;
 
@@ -18,7 +16,6 @@ public class UpdateStatementBuilder {
   private PGgeometry toPGeometry = null;
 
   public UpdateStatementBuilder(Connection connection, String table) {
-    this.table = table;
     this.connection = connection;
     sqlUpdateStatement.append("UPDATE ").append(table);
   }
@@ -79,7 +76,6 @@ public class UpdateStatementBuilder {
   }
 
   public void execute() throws SQLException {
-    System.out.println("The update statement is:   " + sqlUpdateStatement.toString());
     QueryHelpers.executeSQLStatement(stmt);
   }
 

@@ -50,7 +50,6 @@ public class SelectQueryBuilder {
     if (!sqlSelectQuery.toString().contains("WHERE")) {
       stmt = connection.prepareStatement(sqlSelectQuery.toString());
     }
-    System.out.println(sqlSelectQuery.toString());
     return QueryHelpers.getResultSet(stmt);
   }
 }
