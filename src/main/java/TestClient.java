@@ -14,7 +14,7 @@ public class TestClient {
   }
 
   public void connectToServer() throws IOException {
-    socket = new Socket(serverIP, QuerySession.SERVER_PORT);
+    socket = new Socket(serverIP, QuerySession.PORT);
     if (socket.isConnected()) {
       System.out.println("It connected");
     } else {
