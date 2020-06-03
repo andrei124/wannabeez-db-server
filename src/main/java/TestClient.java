@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.sql.Timestamp;
 
 public class TestClient {
   private final String serverIP;
@@ -37,10 +38,13 @@ public class TestClient {
   }
 
   public static void main(String[] args) throws IOException {
-    TestClient client = new TestClient("placehoooder");
+    TestClient client = new TestClient("placeholder");
     client.connectToServer();
     client.sendJsonObject("{"
-        + "\"id\": 123"
+        + "\"userId\": 123,"
+        + "\"imageId\": 456,"
+        + "\"timestamp\": \"" + new Timestamp(System.currentTimeMillis()).toString() + "\","
+        + "\"url\": \"www.rofl.doc.ic.ac.uk\""
         + "}");
   }
 }
