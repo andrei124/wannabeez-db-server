@@ -3,13 +3,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.sql.SQLException;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 public class RequestProcessor implements Runnable {
 
   private final Socket clientSocket;
-  private QueryProcessor queryProcessor;
+  private final QueryProcessor queryProcessor;
 
   public RequestProcessor(Socket clientSocket) {
     this.clientSocket = clientSocket;
@@ -27,9 +27,15 @@ public class RequestProcessor implements Runnable {
       String clientInput;
 
       while ((clientInput = reader.readLine()) != null) {
-        parseClientInput(clientInput);
-        String result = "Result";
+        ImageObject obj = parseClientInput(clientInput);
+        String result;
+        if (insertImageMetaDataIntoDB(obj)) {
+          result = "Image Received";
+        } else {
+          result = "Something went wrong";
+        }
         writer.println(result);
+
       }
     } catch (IOException | JSONException e) {
       System.out.println("IO Exception occurred when trying to open Input or Output stream");
@@ -37,12 +43,21 @@ public class RequestProcessor implements Runnable {
     }
   }
 
-  private void parseClientInput(String clientInput) throws JSONException {
-    System.out.println("Client input: " + clientInput);
-    ImageObject obj = new ImageObject(clientInput);
-    System.out.println(obj.getImageId());
-    System.out.println(obj.getUserId());
-    System.out.println(obj.getTimestamp());
-    System.out.println(obj.getUrl());
+  private ImageObject parseClientInput(String clientInput) throws JSONException {
+    return new ImageObject(clientInput);
+  }
+
+  public boolean insertImageMetaDataIntoDB(ImageObject obj) {
+    queryProcessor.connect();
+
+    try {
+      queryProcessor.insert("gallery", obj.getImageId(), obj.getTimestamp(), obj.getPlayerId(), obj.getUrl());
+    } catch (SQLException throwables) {
+      throwables.printStackTrace();
+      return false;
+    } finally {
+      queryProcessor.closeConnection();
+    }
+    return true;
   }
 }

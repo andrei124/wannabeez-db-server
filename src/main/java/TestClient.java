@@ -41,8 +41,8 @@ public class TestClient {
     TestClient client = new TestClient("placeholder");
     client.connectToServer();
     client.sendJsonObject("{"
-        + "\"userId\": 123,"
-        + "\"imageId\": 456,"
+        + "\"playerId\": 0,"
+        + "\"imageId\": 0,"
         + "\"timestamp\": \"" + new Timestamp(System.currentTimeMillis()).toString() + "\","
         + "\"url\": \"www.rofl.doc.ic.ac.uk\""
         + "}");
