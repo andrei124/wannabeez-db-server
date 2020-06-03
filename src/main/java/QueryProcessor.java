@@ -188,6 +188,16 @@ public class QueryProcessor {
     return new SelectQueryBuilder(connection, columns);
   }
 
+
+  /**
+   * Method for SQL UPDATE Statement
+   * @param table -- name of table to be updated
+   * @return -- UpdateStatementBuilder -- to be used in order to execute the Update statement
+   */
+  public UpdateStatementBuilder update(String table) {
+    return new UpdateStatementBuilder(connection, table);
+}
+
   /**
    * Method for Prepared UPDATE SQL statement * Method is overloaded to support UPDATE statements
    * for every possible combination of (setValue, whereValue) (e.g. UPDATE ? SET ? = String WHERE ?

@@ -25,10 +25,10 @@ public class QueryProcessorUpdateTest {
           {
             exactly(1)
                 .of(mockJDBCconnection)
-                .prepareStatement("UPDATE Player SET email = ? WHERE password = ?");
+                .prepareStatement("UPDATE Player SET email = 'example@email.com' WHERE password = 'example123'");
           }
         });
-    queryProcessor.update("Player", "email", "example@email.com", "password", "example123");
+    queryProcessor.update("Player").set("email").to("example@email.com").where("password").is("example123").execute();
   }
 
   @Test
@@ -38,10 +38,10 @@ public class QueryProcessorUpdateTest {
           {
             exactly(1)
                 .of(mockJDBCconnection)
-                .prepareStatement("UPDATE Player SET email = ? WHERE id = ?");
+                .prepareStatement("UPDATE Player SET email = 'example@email.com' WHERE id = 123");
           }
         });
-    queryProcessor.update("Player", "email", "example@email.com", "id", 123);
+    queryProcessor.update("Player").set("email").to("example@email.com").where("id").is(123).execute();
   }
 
   @Test
@@ -51,10 +51,10 @@ public class QueryProcessorUpdateTest {
           {
             exactly(1)
                 .of(mockJDBCconnection)
-                .prepareStatement("UPDATE Gallery SET url = ? WHERE ts = ?");
+                .prepareStatement("UPDATE Gallery SET url = 'example_url' WHERE ts = " + exampleTS.toString());
           }
         });
-    queryProcessor.update("Gallery", "url", "basicURL", "ts", exampleTS);
+    queryProcessor.update("Gallery").set("url").to("example_url").where("ts").is(exampleTS).execute();
   }
 
   @Test
@@ -64,10 +64,10 @@ public class QueryProcessorUpdateTest {
           {
             exactly(1)
                 .of(mockJDBCconnection)
-                .prepareStatement("UPDATE Landmark SET description = ? WHERE location = ?");
+                .prepareStatement("UPDATE Landmark SET description = 'Sample Description' WHERE location = " + examplePG.toString());
           }
         });
-    queryProcessor.update("Landmark", "description", "Sample Description", "location", examplePG);
+    queryProcessor.update("Landmark").set("description").to("Sample Description").where("location").is(examplePG).execute();
   }
 
   @Test

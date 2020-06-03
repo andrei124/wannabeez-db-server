@@ -36,7 +36,7 @@ public class QueryProcessorDeleteTest {
           {
             exactly(1)
                 .of(mockJDBCconnection)
-                .prepareStatement("DELETE FROM Player WHERE email = example@email.com");
+                .prepareStatement("DELETE FROM Player WHERE email = 'example@email.com'");
           }
         });
     queryProcessor.delete().from("Player").where("email").is("example@email.com").execute();

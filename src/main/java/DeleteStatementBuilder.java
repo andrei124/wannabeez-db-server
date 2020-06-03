@@ -26,7 +26,7 @@ public class DeleteStatementBuilder {
   }
 
   public DeleteStatementBuilder is(String value) {
-    sqlDeleteStatement.append(value);
+    sqlDeleteStatement.append("'").append(value).append("'");
     return this;
   }
 

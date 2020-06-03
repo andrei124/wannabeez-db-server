@@ -5,6 +5,7 @@ public class SelectQueryBuilder {
 
   private StringBuilder sqlSelectQuery;
   private Connection connection;
+  private PreparedStatement stmt;
 
   public SelectQueryBuilder(Connection connection, String... columns) {
     this.connection = connection;
@@ -20,33 +21,37 @@ public class SelectQueryBuilder {
     return this;
   }
 
-  public SelectQueryBuilder where(String whereParam) {
-    sqlSelectQuery.append(" WHERE ").append(whereParam).append(" = ");
+  public SelectQueryBuilder where(String whereParam) throws SQLException {
+    sqlSelectQuery.append(" WHERE ").append(whereParam).append(" = ?");
+    stmt = connection.prepareStatement(sqlSelectQuery.toString());
     return this;
   }
 
-  public SelectQueryBuilder is(String value) {
-    sqlSelectQuery.append(value);
+  public SelectQueryBuilder is(String value) throws SQLException {
+    stmt.setString(1, value);
     return this;
   }
 
-  public SelectQueryBuilder is(Integer value) {
-    sqlSelectQuery.append(value);
+  public SelectQueryBuilder is(Integer value) throws SQLException {
+    stmt.setInt(1, value);
     return this;
   }
 
-  public SelectQueryBuilder is(Timestamp value) {
-    sqlSelectQuery.append(value);
+  public SelectQueryBuilder is(Timestamp value) throws SQLException {
+    stmt.setTimestamp(1, value);
     return this;
   }
 
-  public SelectQueryBuilder is(PGgeometry value) {
-    sqlSelectQuery.append(value);
+  public SelectQueryBuilder is(PGgeometry value) throws SQLException {
+    stmt.setObject(1, value);
     return this;
   }
 
   public ResultSet execute() throws SQLException {
-    PreparedStatement stmt = connection.prepareStatement(sqlSelectQuery.toString());
+    if (!sqlSelectQuery.toString().contains("WHERE")) {
+      stmt = connection.prepareStatement(sqlSelectQuery.toString());
+    }
+    System.out.println(sqlSelectQuery.toString());
     return QueryHelpers.getResultSet(stmt);
   }
 }

@@ -35,7 +35,7 @@ public class QueryProcessorSelectTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("SELECT * FROM Player WHERE id = 1");
+            exactly(1).of(mockJDBCconnection).prepareStatement("SELECT * FROM Player WHERE id = ?");
           }
         });
     queryProcessor.select("*").from("Player").where("id").is(1).execute();
@@ -49,7 +49,7 @@ public class QueryProcessorSelectTest {
             exactly(1)
                 .of(mockJDBCconnection)
                 .prepareStatement(
-                    "SELECT id FROM Location WHERE location = " + examplePG.toString());
+                    "SELECT id FROM Location WHERE location = ?");
           }
         });
     queryProcessor.select("id").from("Location").where("location").is(examplePG).execute();
@@ -63,7 +63,7 @@ public class QueryProcessorSelectTest {
             exactly(1)
                 .of(mockJDBCconnection)
                 .prepareStatement(
-                    "SELECT player_id,url FROM Gallery WHERE ts = " + exampleTS.toString());
+                    "SELECT player_id,url FROM Gallery WHERE ts = ?");
           }
         });
     queryProcessor.select("player_id,url").from("Gallery").where("ts").is(exampleTS).execute();
@@ -76,7 +76,7 @@ public class QueryProcessorSelectTest {
           {
             exactly(1)
                 .of(mockJDBCconnection)
-                .prepareStatement("SELECT type FROM Landmark WHERE description = " + exampleSTR);
+                .prepareStatement("SELECT type FROM Landmark WHERE description = ?");
           }
         });
     queryProcessor.select("type").from("Landmark").where("description").is(exampleSTR).execute();
