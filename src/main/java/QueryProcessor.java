@@ -2,8 +2,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Properties;
 import org.postgis.PGgeometry;
 
@@ -105,8 +103,7 @@ public class QueryProcessor {
   }
 
   /** Insert SQL Prepared statement for PLAYER_STATS * */
-  public void addPlayerStats(Integer player_id, Integer xp, Integer cash)
-      throws SQLException {
+  public void addPlayerStats(Integer player_id, Integer xp, Integer cash) throws SQLException {
     insert("Player_Stats", player_id, xp, cash);
   }
 
@@ -186,136 +183,13 @@ public class QueryProcessor {
   }
 
   /**
-   * Method for Prepared SELECT SQL statement *
+   * Method for SQL Select Query
    *
-   * @param tableName -- name of table to make query on
-   * @param columns -- columns to be selected
-   * @return ResultSet -- object representing retrieved rows
-   * @throws SQLException
+   * @param columns
+   * @return SelectQueryBuilder -- to be used in order to perform the query
    */
-  public ResultSet selectFrom(String tableName, String... columns) throws SQLException {
-    PreparedStatement stmt =
-        connection.prepareStatement(
-            "SELECT " + getColumnsToBeQueried(columns) + " FROM " + tableName);
-
-    String queryColums = getColumnsToBeQueried(columns);
-    System.out.println("Columns to be queired: " + queryColums);
-
-    return getResultSet(stmt);
-  }
-
-  /**
-   * Method for Prepared SELECT with WHERE clause SQL statements * Method is overloaded for each of
-   * the different types an entry in the database can take
-   *
-   * @param tableName -- name of table to make query on
-   * @param indexColumn -- filtering parameter in the WHERE clause
-   * @param value -- value required for the filtering parameter
-   * @param arguments -- columns to be selected
-   * @return ResultSet -- object representing retrieved rows
-   * @throws SQLException
-   */
-  public ResultSet selectFromWhere(
-      String tableName, String indexColumn, String value, String... arguments) throws SQLException {
-    PreparedStatement stmt =
-        connection.prepareStatement(
-            "SELECT "
-                + getColumnsToBeQueried(arguments)
-                + " FROM "
-                + tableName
-                + " WHERE "
-                + indexColumn
-                + " = ?");
-
-    stmt.setString(1, value);
-
-    return getResultSet(stmt);
-  }
-
-  public ResultSet selectFromWhere(
-      String tableName, String indexColumn, Integer value, String... arguments)
-      throws SQLException {
-    PreparedStatement stmt =
-        connection.prepareStatement(
-            "SELECT "
-                + getColumnsToBeQueried(arguments)
-                + " FROM "
-                + tableName
-                + " WHERE "
-                + indexColumn
-                + " = ?");
-
-    stmt.setInt(1, value);
-
-    return getResultSet(stmt);
-  }
-
-  public ResultSet selectFromWhere(
-      String tableName, String indexColumn, PGgeometry value, String... arguments)
-      throws SQLException {
-    PreparedStatement stmt =
-        connection.prepareStatement(
-            "SELECT "
-                + getColumnsToBeQueried(arguments)
-                + " FROM "
-                + tableName
-                + " WHERE "
-                + indexColumn
-                + " = ?");
-
-    stmt.setObject(1, value);
-
-    return getResultSet(stmt);
-  }
-
-  public ResultSet selectFromWhere(
-      String tableName, String indexColumn, Timestamp value, String... arguments)
-      throws SQLException {
-    PreparedStatement stmt =
-        connection.prepareStatement(
-            "SELECT "
-                + getColumnsToBeQueried(arguments)
-                + " FROM "
-                + tableName
-                + " WHERE "
-                + indexColumn
-                + " = ?");
-
-    stmt.setTimestamp(1, value);
-
-    return getResultSet(stmt);
-  }
-
-  /**
-   * Helper method for getting the columns to be queried into the SELECT statement *
-   *
-   * @param arguments - list of column names to be selected
-   * @return
-   */
-  private String getColumnsToBeQueried(String... arguments) {
-    List<String> args = Arrays.asList(arguments);
-    int len = args.size();
-    StringBuilder sb = new StringBuilder();
-
-    for (int i = 0; i < len; i++) {
-      if (i != len - 1) {
-        sb.append(args.get(i)).append(",");
-      } else {
-        sb.append(args.get(i));
-      }
-    }
-    return sb.toString();
-  }
-
-  /**
-   * Helper method for retrieving the result of an SQL query *
-   *
-   * @param stmt - statement to retrieve the result for
-   * @return
-   * @throws SQLException
-   */
-  private ResultSet getResultSet(PreparedStatement stmt) throws SQLException {
-    return stmt.executeQuery();
+  public SelectQueryBuilder select(String... columns) {
+    return new SelectQueryBuilder(connection, columns);
   }
 
   /**
