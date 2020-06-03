@@ -50,7 +50,7 @@ public class RequestProcessor implements Runnable {
     queryProcessor.connect();
 
     try {
-      queryProcessor.insertIntoGallery(obj.getTimestamp(), obj.getPlayerId(), obj.getUrl());
+      queryProcessor.addNewImageMetaData(obj.getTimestamp(), obj.getPlayerId(), obj.getUrl());
     } catch (SQLException throwables) {
       throwables.printStackTrace();
       return false;

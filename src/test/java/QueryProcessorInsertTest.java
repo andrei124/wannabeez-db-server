@@ -31,7 +31,7 @@ public class QueryProcessorInsertTest {
           }
         });
 
-    queryProcessor.insertIntoPlayer("email", "password");
+    queryProcessor.addNewPlayer("email", "password");
   }
 
   @Test
@@ -49,7 +49,7 @@ public class QueryProcessorInsertTest {
           }
         });
 
-    queryProcessor.insertIntoGallery(exampleTS, 2, "Description");
+    queryProcessor.addNewImageMetaData(exampleTS, 2, "Description");
   }
 
   @Test
@@ -64,7 +64,7 @@ public class QueryProcessorInsertTest {
           }
         });
 
-    queryProcessor.insertIntoPlayerStats(12, 102, 1236);
+    queryProcessor.addPlayerStats(12, 102, 1236);
   }
 
   @Test
@@ -77,7 +77,7 @@ public class QueryProcessorInsertTest {
           }
         });
 
-    queryProcessor.insertIntoLocation(1, examplePG);
+    queryProcessor.addNewLocation(1, examplePG);
   }
 
   @Test
@@ -95,7 +95,7 @@ public class QueryProcessorInsertTest {
           }
         });
 
-    queryProcessor.insertIntoLandmark(examplePG, 6, "Example Landmark");
+    queryProcessor.addNewLandmark(examplePG, 6, "Example Landmark");
   }
 
   @Test
@@ -110,6 +110,6 @@ public class QueryProcessorInsertTest {
           }
         });
 
-    queryProcessor.insertIntoLandmarkType("Example Landmark Type");
+    queryProcessor.addNewLandmarkType("Example Landmark Type");
   }
 }

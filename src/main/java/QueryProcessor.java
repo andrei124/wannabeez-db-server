@@ -91,7 +91,7 @@ public class QueryProcessor {
    *
    * <p>Insert SQL Prepared statement for PLAYER *
    */
-  public void insertIntoPlayer(String email, String password) throws SQLException {
+  public void addNewPlayer(String email, String password) throws SQLException {
     insert("Player", email, password);
   }
 
@@ -105,7 +105,7 @@ public class QueryProcessor {
   }
 
   /** Insert SQL Prepared statement for PLAYER_STATS * */
-  public void insertIntoPlayerStats(Integer player_id, Integer xp, Integer cash)
+  public void addPlayerStats(Integer player_id, Integer xp, Integer cash)
       throws SQLException {
     insert("Player_Stats", player_id, xp, cash);
   }
@@ -121,7 +121,7 @@ public class QueryProcessor {
   }
 
   /** Insert SQL Prepared statement for GALLERY * */
-  public void insertIntoGallery(Timestamp ts, Integer playerId, String url) throws SQLException {
+  public void addNewImageMetaData(Timestamp ts, Integer playerId, String url) throws SQLException {
     insert("Gallery", ts, playerId, url);
   }
 
@@ -137,7 +137,7 @@ public class QueryProcessor {
   }
 
   /** Insert SQL Prepared statement for LOCATION * */
-  public void insertIntoLocation(Integer imageId, PGgeometry location) throws SQLException {
+  public void addNewLocation(Integer imageId, PGgeometry location) throws SQLException {
     insert("Location", imageId, location);
   }
 
@@ -150,7 +150,7 @@ public class QueryProcessor {
   }
 
   /** Insert SQL Prepared statement for LANDMARK * */
-  public void insertIntoLandmark(PGgeometry location, Integer type, String description)
+  public void addNewLandmark(PGgeometry location, Integer type, String description)
       throws SQLException {
     insert("Landmark", location, type, description);
   }
@@ -170,7 +170,7 @@ public class QueryProcessor {
   }
 
   /** Insert SQL Prepared statement for LANDMARK_TYPE * */
-  public void insertIntoLandmarkType(String name) throws SQLException {
+  public void addNewLandmarkType(String name) throws SQLException {
     insert("Landmark_Type", name);
   }
 
