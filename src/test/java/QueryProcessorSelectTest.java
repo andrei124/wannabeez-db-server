@@ -27,7 +27,7 @@ public class QueryProcessorSelectTest {
             exactly(1).of(mockJDBCconnection).prepareStatement("SELECT id FROM Player");
           }
         });
-    queryProcessor.selectFrom("Player", "id");
+    queryProcessor.select("id").from("Player").execute();
   }
 
   @Test
@@ -38,7 +38,7 @@ public class QueryProcessorSelectTest {
             exactly(1).of(mockJDBCconnection).prepareStatement("SELECT * FROM Player WHERE id = ?");
           }
         });
-    queryProcessor.selectFromWhere("Player", "id", 1, "*");
+    queryProcessor.select("*").from("Player").where("id").is(1).execute();
   }
 
   @Test
@@ -51,7 +51,7 @@ public class QueryProcessorSelectTest {
                 .prepareStatement("SELECT id FROM Location WHERE location = ?");
           }
         });
-    queryProcessor.selectFromWhere("Location", "location", examplePG, "id");
+    queryProcessor.select("id").from("Location").where("location").is(examplePG).execute();
   }
 
   @Test
@@ -64,7 +64,7 @@ public class QueryProcessorSelectTest {
                 .prepareStatement("SELECT player_id,url FROM Gallery WHERE ts = ?");
           }
         });
-    queryProcessor.selectFromWhere("Gallery", "ts", exampleTS, "player_id,url");
+    queryProcessor.select("player_id,url").from("Gallery").where("ts").is(exampleTS).execute();
   }
 
   @Test
@@ -77,6 +77,6 @@ public class QueryProcessorSelectTest {
                 .prepareStatement("SELECT type FROM Landmark WHERE description = ?");
           }
         });
-    queryProcessor.selectFromWhere("Landmark", "description", exampleSTR, "type");
+    queryProcessor.select("type").from("Landmark").where("description").is(exampleSTR).execute();
   }
 }

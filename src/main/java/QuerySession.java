@@ -1,12 +1,14 @@
+
+import java.io.IOException;
 import java.sql.SQLException;
 
 public class QuerySession {
 
-  public static void main(String[] args) throws SQLException {
+  public static final int PORT = 8500;
 
-    QueryProcessor queryProcessor = new QueryProcessor();
-    queryProcessor.connect();
-    queryProcessor.closeConnection();
+  public static void main(String[] args) throws IOException {
+    Server server = new Server(PORT, new QueryProcessor(), new ImageProcessor());
+    server.start();
   }
 
 }

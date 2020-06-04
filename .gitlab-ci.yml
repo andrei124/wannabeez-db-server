@@ -17,7 +17,9 @@ deploy:
     - production
   script:
     - cp ~/config.properties ./
+    - docker stop $(docker ps -a |grep dbi |awk '{print $1}')
+    - docker rm $(docker ps -a |grep dbi |awk '{print $1}')
     - docker build --tag dbi .
-    - docker run dbi
+    - docker run -d -p 42069:8500 dbi
   only:
     - master
