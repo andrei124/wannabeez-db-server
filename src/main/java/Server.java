@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,11 +23,11 @@ public class Server {
     this.queryProcessor = queryProcessor;
     this.httpServer = HttpServer.create(new InetSocketAddress(port), 0);
     HttpContext insertContext = this.httpServer.createContext("/insert");
-    insertContext.setHandler(Server::handleInsert);
+    insertContext.setHandler(this::handleInsert);
     HttpContext selectContext = this.httpServer.createContext("/select");
-    selectContext.setHandler(Server::handleSelect);
+    selectContext.setHandler(this::handleSelect);
     HttpContext updateContext = this.httpServer.createContext("/update");
-    updateContext.setHandler(Server::handleUpdate);
+    updateContext.setHandler(this::handleUpdate);
   }
 
   public void start() {
@@ -35,7 +36,7 @@ public class Server {
     System.out.println("Server started");
   }
 
-  private static void handleInsert(HttpExchange exchange) throws IOException {
+  private void handleInsert(HttpExchange exchange) throws IOException {
     // extract info from request
     URI requestURI = exchange.getRequestURI();
     String method = requestURI.getPath().replace("/insert/", "");
@@ -47,15 +48,25 @@ public class Server {
       switch (method) {
         case "gallery":
           System.out.println("gallery insertion");
-          //TODO: QUERYPROCESSOR GALLERY SHIT
-          // SOMETHING LIKE THIS : this.queryProcessor.insert("gallery", .....);
-          safeMapLookup(params, "asdfasdf");
+          this.queryProcessor.addNewImageMetaData(
+              Timestamp.valueOf(safeMapLookup(params, "timestamp")),
+              Integer.parseInt(safeMapLookup(params, "player")),
+              safeMapLookup(params, "url")
+          );
           response = SUCCESS;
           break;
+        // TODO: handle other cases
       }
     } catch (KeyNotFoundException e) {
       // catch missing params
       response = BAD_PARAMS;
+    } catch (NumberFormatException e) {
+      // catch missing params
+      response = BAD_PARAMS;
+    } catch (IllegalArgumentException e) {
+      response = BAD_PARAMS;
+    } catch (SQLException e) {
+      response = DATABASE_ERROR;
     }
 
     // send response
@@ -65,7 +76,7 @@ public class Server {
     os.close();
   }
 
-  private static void handleSelect(HttpExchange exchange) throws IOException {
+  private void handleSelect(HttpExchange exchange) throws IOException {
     // extract info from request
     URI requestURI = exchange.getRequestURI();
     String method = requestURI.getPath().replace("/insert/", "");
@@ -93,7 +104,7 @@ public class Server {
     os.close();
   }
 
-  private static void handleUpdate(HttpExchange exchange) throws IOException {
+  private void handleUpdate(HttpExchange exchange) throws IOException {
     // extract info from request
     URI requestURI = exchange.getRequestURI();
     String method = requestURI.getPath().replace("/insert/", "");
