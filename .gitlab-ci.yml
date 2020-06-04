@@ -23,4 +23,3 @@ deploy:
     - docker run -d -p 42069:8500 dbi
   only:
     - master
-    - containerisation
