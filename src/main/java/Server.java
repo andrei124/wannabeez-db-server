@@ -29,6 +29,8 @@ public class Server {
     selectContext.setHandler(this::handleSelect);
     HttpContext updateContext = this.httpServer.createContext("/update");
     updateContext.setHandler(this::handleUpdate);
+    HttpContext deleteContext = this.httpServer.createContext("/delete");
+    deleteContext.setHandler(this::handleDelete);
   }
 
   public void start() {
@@ -166,9 +168,9 @@ public class Server {
       UpdateStatementBuilder builder = queryProcessor.update(table);
       ;
       builder = getUpdateSetTo(builder, params, column);
-      builder = getUpdateWhereClause(builder, params, indexColumn);
+      builder = (UpdateStatementBuilder) getWhereClause(builder, params, indexColumn);
 
-      System.out.println(builder.getSqlUpdateStatement().toString());
+      System.out.println(builder.getSQLStatement().toString());
 
       builder.execute();
       response = SUCCESS;
@@ -183,6 +185,57 @@ public class Server {
     OutputStream os = exchange.getResponseBody();
     os.write(response.getBytes());
     os.close();
+  }
+
+  private void handleDelete(HttpExchange exchange) throws IOException {
+    // extract info from request
+    URI requestURI = exchange.getRequestURI();
+    requestURI.getPath().replace("/delete/", "");
+    Map<String, String> params = parseQuery(requestURI.getQuery());
+
+    String response = METHOD_NOT_FOUND;
+    try {
+      System.out.println("Delete statement invoked");
+      String table = safeMapLookup(params, "from");
+      String indexColumn = safeMapLookup(params, "where");
+
+      DeleteStatementBuilder builder = queryProcessor.delete().from(table);
+      ;
+      builder = (DeleteStatementBuilder) getWhereClause(builder, params, indexColumn);
+
+      System.out.println(builder.getSQLStatement().toString());
+
+      builder.execute();
+      response = SUCCESS;
+    } catch (KeyNotFoundException e) {
+      // catch missing params
+      response = BAD_PARAMS;
+    } catch (SQLException e) {
+      response = DATABASE_ERROR;
+    }
+    // send response
+    exchange.sendResponseHeaders(200, response.getBytes().length);
+    OutputStream os = exchange.getResponseBody();
+    os.write(response.getBytes());
+    os.close();
+  }
+
+  public static Map<String, String> parseQuery(String url) {
+    Map<String, String> queryPairs = new HashMap<>();
+    if (url != null) {
+      String[] pairs = url.split("&");
+      for (String pair : pairs) {
+        int idx = pair.indexOf("=");
+        queryPairs.put(pair.substring(0, idx), pair.substring(idx + 1));
+      }
+    }
+    return queryPairs;
+  }
+
+  public static String safeMapLookup(Map<String, String> map, String key)
+      throws KeyNotFoundException {
+    if (map.get(key) == null) throw new KeyNotFoundException();
+    return map.get(key);
   }
 
   private UpdateStatementBuilder getUpdateSetTo(
@@ -223,8 +276,8 @@ public class Server {
     return builder;
   }
 
-  private UpdateStatementBuilder getUpdateWhereClause(
-      UpdateStatementBuilder builder, Map<String, String> params, String column)
+  private WhereClauseBuilder getWhereClause(
+      WhereClauseBuilder builder, Map<String, String> params, String column)
       throws KeyNotFoundException, SQLException {
     switch (column) {
       case "player_id":
@@ -259,23 +312,5 @@ public class Server {
         System.out.println("DEFAULT CASE HAS BEEN REACHED");
     }
     return builder;
-  }
-
-  public static Map<String, String> parseQuery(String url) {
-    Map<String, String> queryPairs = new HashMap<>();
-    if (url != null) {
-      String[] pairs = url.split("&");
-      for (String pair : pairs) {
-        int idx = pair.indexOf("=");
-        queryPairs.put(pair.substring(0, idx), pair.substring(idx + 1));
-      }
-    }
-    return queryPairs;
-  }
-
-  public static String safeMapLookup(Map<String, String> map, String key)
-      throws KeyNotFoundException {
-    if (map.get(key) == null) throw new KeyNotFoundException();
-    return map.get(key);
   }
 }
