@@ -1,14 +1,23 @@
-import com.sun.net.httpserver.*;
-import org.postgis.PGgeometry;
-
+import com.sun.net.httpserver.HttpContext;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import org.postgis.PGgeometry;
 
 public class Server {
 
@@ -18,11 +27,15 @@ public class Server {
   private static final String DATABASE_ERROR = "database error";
 
   private final QueryProcessor queryProcessor;
+  private final ImageProcessor imageProcessor;
   private final HttpServer httpServer;
 
-  public Server(int port, QueryProcessor queryProcessor) throws IOException {
+  public Server(int port, QueryProcessor queryProcessor, ImageProcessor imageProcessor)
+      throws IOException {
     this.queryProcessor = queryProcessor;
+    this.imageProcessor = imageProcessor;
     this.httpServer = HttpServer.create(new InetSocketAddress(port), 0);
+    /* QueryProcessor contexts */
     HttpContext insertContext = this.httpServer.createContext("/insert");
     insertContext.setHandler(this::handleInsert);
     HttpContext selectContext = this.httpServer.createContext("/select");
@@ -31,12 +44,60 @@ public class Server {
     updateContext.setHandler(this::handleUpdate);
     HttpContext deleteContext = this.httpServer.createContext("/delete");
     deleteContext.setHandler(this::handleDelete);
+
+    /* ImageProcessor contexts */
+    HttpContext uploadContext = this.httpServer.createContext("/upload");
+    uploadContext.setHandler(this::handleUpload);
+  }
+
+  public static Map<String, String> parseQuery(String url) {
+    Map<String, String> queryPairs = new HashMap<>();
+    if (url != null) {
+      String[] pairs = url.split("&");
+      for (String pair : pairs) {
+        int idx = pair.indexOf("=");
+        queryPairs.put(pair.substring(0, idx), pair.substring(idx + 1));
+      }
+    }
+    return queryPairs;
+  }
+
+  public static String safeMapLookup(Map<String, String> map, String key)
+      throws KeyNotFoundException {
+    if (map.get(key) == null) throw new KeyNotFoundException();
+    return map.get(key);
   }
 
   public void start() {
     this.queryProcessor.connect();
     this.httpServer.start();
     System.out.println("Server started");
+  }
+
+  private String imagesPath = "images/";
+
+  private void handleUpload(HttpExchange exchange) throws IOException {
+    URI requestURI = exchange.getRequestURI();
+    byte[] form = exchange.getRequestBody().readAllBytes();
+    System.out.println(form.length);
+
+    try {
+      // FileWriter myWriter = new FileWriter("filename.png");
+      String ts = new Timestamp(System.currentTimeMillis()).toString().replace(" ", "_");
+      Files.write(Paths.get(imagesPath + "image" + ts + ".png"), form);
+
+      // myWriter.close();
+      System.out.println("Successfully wrote to the file.");
+    } catch (IOException e) {
+      System.out.println("An error occurred.");
+      e.printStackTrace();
+    }
+
+    System.out.println(Integer.toHexString(form[0]));
+    System.out.println(new String(exchange.getRequestBody().readAllBytes()));
+
+    String byteArray = requestURI.getPath().replace("/upload/", "");
+    System.out.println(byteArray);
   }
 
   private void handleInsert(HttpExchange exchange) throws IOException {
@@ -218,24 +279,6 @@ public class Server {
     OutputStream os = exchange.getResponseBody();
     os.write(response.getBytes());
     os.close();
-  }
-
-  public static Map<String, String> parseQuery(String url) {
-    Map<String, String> queryPairs = new HashMap<>();
-    if (url != null) {
-      String[] pairs = url.split("&");
-      for (String pair : pairs) {
-        int idx = pair.indexOf("=");
-        queryPairs.put(pair.substring(0, idx), pair.substring(idx + 1));
-      }
-    }
-    return queryPairs;
-  }
-
-  public static String safeMapLookup(Map<String, String> map, String key)
-      throws KeyNotFoundException {
-    if (map.get(key) == null) throw new KeyNotFoundException();
-    return map.get(key);
   }
 
   private UpdateStatementBuilder getUpdateSetTo(
