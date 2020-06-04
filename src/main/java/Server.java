@@ -168,6 +168,8 @@ public class Server {
       builder = getUpdateSetTo(builder, params, column);
       builder = getUpdateWhereClause(builder, params, indexColumn);
 
+      System.out.println(builder.getSqlUpdateStatement().toString());
+
       builder.execute();
       response = SUCCESS;
     } catch (KeyNotFoundException e) {
@@ -176,7 +178,6 @@ public class Server {
     } catch (SQLException e) {
       response = DATABASE_ERROR;
     }
-
     // send response
     exchange.sendResponseHeaders(200, response.getBytes().length);
     OutputStream os = exchange.getResponseBody();
@@ -186,10 +187,13 @@ public class Server {
 
   private UpdateStatementBuilder getUpdateSetTo(
       UpdateStatementBuilder builder, Map<String, String> params, String column)
-      throws KeyNotFoundException {
+      throws KeyNotFoundException, SQLException {
     switch (column) {
       case "player_id":
       case "id":
+      case "type":
+      case "xp":
+      case "cash":
         {
           builder = builder.set(column).to(Integer.parseInt(safeMapLookup(params, "to")));
           break;
@@ -199,9 +203,18 @@ public class Server {
           builder = builder.set(column).to(Timestamp.valueOf(safeMapLookup(params, "to")));
           break;
         }
+      case "email":
+      case "password":
       case "url":
+      case "description":
+      case "name":
         {
           builder = builder.set(column).to(safeMapLookup(params, "to"));
+          break;
+        }
+      case "location":
+        {
+          builder = builder.set(column).to(new PGgeometry(safeMapLookup(params, "to")));
           break;
         }
       default:
@@ -216,6 +229,9 @@ public class Server {
     switch (column) {
       case "player_id":
       case "id":
+      case "type":
+      case "xp":
+      case "cash":
         {
           builder = builder.where(column).is(Integer.parseInt(safeMapLookup(params, "is")));
           break;
@@ -225,11 +241,22 @@ public class Server {
           builder = builder.where(column).is(Timestamp.valueOf(safeMapLookup(params, "is")));
           break;
         }
+      case "email":
+      case "password":
       case "url":
+      case "description":
+      case "name":
         {
           builder = builder.where(column).is(safeMapLookup(params, "is"));
           break;
         }
+      case "location":
+        {
+          builder = builder.where(column).is(new PGgeometry(safeMapLookup(params, "is")));
+          break;
+        }
+      default:
+        System.out.println("DEFAULT CASE HAS BEEN REACHED");
     }
     return builder;
   }
