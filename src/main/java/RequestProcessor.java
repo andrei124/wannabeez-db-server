@@ -35,7 +35,6 @@ public class RequestProcessor implements Runnable {
           result = "Something went wrong";
         }
         writer.println(result);
-
       }
     } catch (IOException | JSONException e) {
       System.out.println("IO Exception occurred when trying to open Input or Output stream");
@@ -51,7 +50,7 @@ public class RequestProcessor implements Runnable {
     queryProcessor.connect();
 
     try {
-      queryProcessor.insert("gallery", obj.getImageId(), obj.getTimestamp(), obj.getPlayerId(), obj.getUrl());
+      queryProcessor.addNewImageMetaData(obj.getTimestamp(), obj.getPlayerId(), obj.getUrl());
     } catch (SQLException throwables) {
       throwables.printStackTrace();
       return false;
