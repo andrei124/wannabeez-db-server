@@ -1,4 +1,7 @@
 import com.sun.net.httpserver.*;
+import org.postgis.Geometry;
+import org.postgis.PGgeometry;
+import org.postgis.Point;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -74,6 +77,13 @@ public class Server {
             response = SUCCESS;
             break;
           }
+        case "location":
+          System.out.println("location insertion");
+          this.queryProcessor.addNewLocation(
+              Integer.parseInt(safeMapLookup(params, "image_id")),
+              new PGgeometry(safeMapLookup(params, "location")));
+          response = SUCCESS;
+          break;
       }
     } catch (KeyNotFoundException e) {
       // catch missing params
