@@ -64,6 +64,16 @@ public class Server {
             response = SUCCESS;
             break;
           }
+        case "player_stats":
+          {
+            System.out.println("player_stats insertion");
+            this.queryProcessor.addPlayerStats(
+                Integer.parseInt(safeMapLookup(params, "player")),
+                Integer.parseInt(safeMapLookup(params, "xp")),
+                Integer.parseInt(safeMapLookup(params, "cash")));
+            response = SUCCESS;
+            break;
+          }
       }
     } catch (KeyNotFoundException e) {
       // catch missing params
