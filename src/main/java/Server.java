@@ -96,6 +96,13 @@ public class Server {
             response = SUCCESS;
             break;
           }
+        case "landmark_type":
+        {
+          System.out.println("landmark_type insertion");
+          this.queryProcessor.addNewLandmarkType(safeMapLookup(params, "name"));
+          response = SUCCESS;
+          break;
+        }
       }
     } catch (KeyNotFoundException e) {
       // catch missing params
