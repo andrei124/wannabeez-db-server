@@ -47,15 +47,23 @@ public class Server {
       // check which method is being used
       switch (method) {
         case "gallery":
-          System.out.println("gallery insertion");
-          this.queryProcessor.addNewImageMetaData(
-              Timestamp.valueOf(safeMapLookup(params, "timestamp")),
-              Integer.parseInt(safeMapLookup(params, "player")),
-              safeMapLookup(params, "url")
-          );
-          response = SUCCESS;
-          break;
-        // TODO: handle other cases
+          {
+            System.out.println("gallery insertion");
+            this.queryProcessor.addNewImageMetaData(
+                Timestamp.valueOf(safeMapLookup(params, "timestamp")),
+                Integer.parseInt(safeMapLookup(params, "player")),
+                safeMapLookup(params, "url"));
+            response = SUCCESS;
+            break;
+          }
+        case "player":
+          {
+            System.out.println("player insertion");
+            this.queryProcessor.addNewPlayer(
+                safeMapLookup(params, "email"), safeMapLookup(params, "password"));
+            response = SUCCESS;
+            break;
+          }
       }
     } catch (KeyNotFoundException e) {
       // catch missing params
@@ -144,10 +152,9 @@ public class Server {
     return queryPairs;
   }
 
-  public static String safeMapLookup(Map<String, String> map, String key) throws KeyNotFoundException{
-    if (map.get(key) == null)
-      throw new KeyNotFoundException();
+  public static String safeMapLookup(Map<String, String> map, String key)
+      throws KeyNotFoundException {
+    if (map.get(key) == null) throw new KeyNotFoundException();
     return map.get(key);
   }
-
 }
