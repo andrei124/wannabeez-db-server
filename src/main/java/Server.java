@@ -79,7 +79,7 @@ public class Server {
   private void handleSelect(HttpExchange exchange) throws IOException {
     // extract info from request
     URI requestURI = exchange.getRequestURI();
-    String method = requestURI.getPath().replace("/insert/", "");
+    String method = requestURI.getPath().replace("/select/", "");
     Map<String, String> params = parseQuery(requestURI.getQuery());
 
     String response = METHOD_NOT_FOUND;
@@ -107,7 +107,7 @@ public class Server {
   private void handleUpdate(HttpExchange exchange) throws IOException {
     // extract info from request
     URI requestURI = exchange.getRequestURI();
-    String method = requestURI.getPath().replace("/insert/", "");
+    String method = requestURI.getPath().replace("/update/", "");
     Map<String, String> params = parseQuery(requestURI.getQuery());
 
     String response = METHOD_NOT_FOUND;
