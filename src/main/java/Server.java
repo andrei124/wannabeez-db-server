@@ -1,7 +1,5 @@
 import com.sun.net.httpserver.*;
-import org.postgis.Geometry;
 import org.postgis.PGgeometry;
-import org.postgis.Point;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -97,12 +95,12 @@ public class Server {
             break;
           }
         case "landmark_type":
-        {
-          System.out.println("landmark_type insertion");
-          this.queryProcessor.addNewLandmarkType(safeMapLookup(params, "name"));
-          response = SUCCESS;
-          break;
-        }
+          {
+            System.out.println("landmark_type insertion");
+            this.queryProcessor.addNewLandmarkType(safeMapLookup(params, "name"));
+            response = SUCCESS;
+            break;
+          }
       }
     } catch (KeyNotFoundException e) {
       // catch missing params
@@ -134,10 +132,12 @@ public class Server {
       // check which method is being used
       switch (method) {
         case "gallery":
-          System.out.println("gallery select");
-          safeMapLookup(params, "asdfasdf");
-          response = SUCCESS;
-          break;
+          {
+            System.out.println("gallery select");
+            safeMapLookup(params, "asdfasdf");
+            response = SUCCESS;
+            break;
+          }
       }
     } catch (KeyNotFoundException e) {
       // catch missing params
@@ -154,22 +154,27 @@ public class Server {
   private void handleUpdate(HttpExchange exchange) throws IOException {
     // extract info from request
     URI requestURI = exchange.getRequestURI();
-    String method = requestURI.getPath().replace("/update/", "");
+    String table = requestURI.getPath().replace("/update/", "");
     Map<String, String> params = parseQuery(requestURI.getQuery());
 
     String response = METHOD_NOT_FOUND;
     try {
-      // check which method is being used
-      switch (method) {
-        case "gallery":
-          System.out.println("gallery update");
-          safeMapLookup(params, "asdfasdf");
-          response = SUCCESS;
-          break;
-      }
+      System.out.println(table + " update");
+      String column = safeMapLookup(params, "set");
+      String indexColumn = safeMapLookup(params, "where");
+
+      UpdateStatementBuilder builder = queryProcessor.update(table);
+      ;
+      builder = getUpdateSetTo(builder, params, column);
+      builder = getUpdateWhereClause(builder, params, indexColumn);
+
+      builder.execute();
+      response = SUCCESS;
     } catch (KeyNotFoundException e) {
       // catch missing params
       response = BAD_PARAMS;
+    } catch (SQLException e) {
+      response = DATABASE_ERROR;
     }
 
     // send response
@@ -177,6 +182,56 @@ public class Server {
     OutputStream os = exchange.getResponseBody();
     os.write(response.getBytes());
     os.close();
+  }
+
+  private UpdateStatementBuilder getUpdateSetTo(
+      UpdateStatementBuilder builder, Map<String, String> params, String column)
+      throws KeyNotFoundException {
+    switch (column) {
+      case "player_id":
+      case "id":
+        {
+          builder = builder.set(column).to(Integer.parseInt(safeMapLookup(params, "to")));
+          break;
+        }
+      case "ts":
+        {
+          builder = builder.set(column).to(Timestamp.valueOf(safeMapLookup(params, "to")));
+          break;
+        }
+      case "url":
+        {
+          builder = builder.set(column).to(safeMapLookup(params, "to"));
+          break;
+        }
+      default:
+        System.out.println("DEFAULT CASE HAS BEEN REACHED");
+    }
+    return builder;
+  }
+
+  private UpdateStatementBuilder getUpdateWhereClause(
+      UpdateStatementBuilder builder, Map<String, String> params, String column)
+      throws KeyNotFoundException, SQLException {
+    switch (column) {
+      case "player_id":
+      case "id":
+        {
+          builder = builder.where(column).is(Integer.parseInt(safeMapLookup(params, "is")));
+          break;
+        }
+      case "ts":
+        {
+          builder = builder.where(column).is(Timestamp.valueOf(safeMapLookup(params, "is")));
+          break;
+        }
+      case "url":
+        {
+          builder = builder.where(column).is(safeMapLookup(params, "is"));
+          break;
+        }
+    }
+    return builder;
   }
 
   public static Map<String, String> parseQuery(String url) {

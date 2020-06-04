@@ -79,6 +79,10 @@ public class UpdateStatementBuilder {
     QueryHelpers.executeSQLStatement(stmt);
   }
 
+  public StringBuilder getSqlUpdateStatement() {
+    return sqlUpdateStatement;
+  }
+
   private void setFirstStatementParam() throws SQLException {
     if (toString != null) {
       stmt.setString(1, toString);
