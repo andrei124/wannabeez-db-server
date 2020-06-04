@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
@@ -84,11 +85,13 @@ public class Server {
     try {
       // FileWriter myWriter = new FileWriter("filename.png");
       String ts = new Timestamp(System.currentTimeMillis()).toString().replace(" ", "_");
-      Files.write(Paths.get(imagesPath + "image" + ts + ".png"), form);
+      String path = imagesPath + "image" + ts + ".png";
+      Files.write(Paths.get(path), form);
+      this.queryProcessor.addNewImageMetaData(Timestamp.valueOf(LocalDateTime.now()), 0, path);
 
       // myWriter.close();
       System.out.println("Successfully wrote to the file.");
-    } catch (IOException e) {
+    } catch (IOException | SQLException e) {
       System.out.println("An error occurred.");
       e.printStackTrace();
     }
