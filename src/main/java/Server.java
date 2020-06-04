@@ -78,12 +78,24 @@ public class Server {
             break;
           }
         case "location":
-          System.out.println("location insertion");
-          this.queryProcessor.addNewLocation(
-              Integer.parseInt(safeMapLookup(params, "image_id")),
-              new PGgeometry(safeMapLookup(params, "location")));
-          response = SUCCESS;
-          break;
+          {
+            System.out.println("location insertion");
+            this.queryProcessor.addNewLocation(
+                Integer.parseInt(safeMapLookup(params, "image_id")),
+                new PGgeometry(safeMapLookup(params, "location")));
+            response = SUCCESS;
+            break;
+          }
+        case "landmark":
+          {
+            System.out.println("landmark insertion");
+            this.queryProcessor.addNewLandmark(
+                new PGgeometry(safeMapLookup(params, "location")),
+                Integer.parseInt(safeMapLookup(params, "type")),
+                safeMapLookup(params, "description"));
+            response = SUCCESS;
+            break;
+          }
       }
     } catch (KeyNotFoundException e) {
       // catch missing params
