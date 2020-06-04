@@ -29,6 +29,8 @@ public class Server {
     selectContext.setHandler(this::handleSelect);
     HttpContext updateContext = this.httpServer.createContext("/update");
     updateContext.setHandler(this::handleUpdate);
+    HttpContext deleteContext = this.httpServer.createContext("/delete");
+    deleteContext.setHandler(this::handleDelete);
   }
 
   public void start() {
@@ -166,7 +168,9 @@ public class Server {
       UpdateStatementBuilder builder = queryProcessor.update(table);
       ;
       builder = getUpdateSetTo(builder, params, column);
-      builder = getUpdateWhereClause(builder, params, indexColumn);
+      builder = (UpdateStatementBuilder) getWhereClause(builder, params, indexColumn);
+
+      System.out.println(builder.getSQLStatement().toString());
 
       builder.execute();
       response = SUCCESS;
@@ -176,7 +180,6 @@ public class Server {
     } catch (SQLException e) {
       response = DATABASE_ERROR;
     }
-
     // send response
     exchange.sendResponseHeaders(200, response.getBytes().length);
     OutputStream os = exchange.getResponseBody();
@@ -184,54 +187,37 @@ public class Server {
     os.close();
   }
 
-  private UpdateStatementBuilder getUpdateSetTo(
-      UpdateStatementBuilder builder, Map<String, String> params, String column)
-      throws KeyNotFoundException {
-    switch (column) {
-      case "player_id":
-      case "id":
-        {
-          builder = builder.set(column).to(Integer.parseInt(safeMapLookup(params, "to")));
-          break;
-        }
-      case "ts":
-        {
-          builder = builder.set(column).to(Timestamp.valueOf(safeMapLookup(params, "to")));
-          break;
-        }
-      case "url":
-        {
-          builder = builder.set(column).to(safeMapLookup(params, "to"));
-          break;
-        }
-      default:
-        System.out.println("DEFAULT CASE HAS BEEN REACHED");
-    }
-    return builder;
-  }
+  private void handleDelete(HttpExchange exchange) throws IOException {
+    // extract info from request
+    URI requestURI = exchange.getRequestURI();
+    requestURI.getPath().replace("/delete/", "");
+    Map<String, String> params = parseQuery(requestURI.getQuery());
 
-  private UpdateStatementBuilder getUpdateWhereClause(
-      UpdateStatementBuilder builder, Map<String, String> params, String column)
-      throws KeyNotFoundException, SQLException {
-    switch (column) {
-      case "player_id":
-      case "id":
-        {
-          builder = builder.where(column).is(Integer.parseInt(safeMapLookup(params, "is")));
-          break;
-        }
-      case "ts":
-        {
-          builder = builder.where(column).is(Timestamp.valueOf(safeMapLookup(params, "is")));
-          break;
-        }
-      case "url":
-        {
-          builder = builder.where(column).is(safeMapLookup(params, "is"));
-          break;
-        }
+    String response = METHOD_NOT_FOUND;
+    try {
+      System.out.println("Delete statement invoked");
+      String table = safeMapLookup(params, "from");
+      String indexColumn = safeMapLookup(params, "where");
+
+      DeleteStatementBuilder builder = queryProcessor.delete().from(table);
+      ;
+      builder = (DeleteStatementBuilder) getWhereClause(builder, params, indexColumn);
+
+      System.out.println(builder.getSQLStatement().toString());
+
+      builder.execute();
+      response = SUCCESS;
+    } catch (KeyNotFoundException e) {
+      // catch missing params
+      response = BAD_PARAMS;
+    } catch (SQLException e) {
+      response = DATABASE_ERROR;
     }
-    return builder;
+    // send response
+    exchange.sendResponseHeaders(200, response.getBytes().length);
+    OutputStream os = exchange.getResponseBody();
+    os.write(response.getBytes());
+    os.close();
   }
 
   public static Map<String, String> parseQuery(String url) {
@@ -250,5 +236,81 @@ public class Server {
       throws KeyNotFoundException {
     if (map.get(key) == null) throw new KeyNotFoundException();
     return map.get(key);
+  }
+
+  private UpdateStatementBuilder getUpdateSetTo(
+      UpdateStatementBuilder builder, Map<String, String> params, String column)
+      throws KeyNotFoundException, SQLException {
+    switch (column) {
+      case "player_id":
+      case "id":
+      case "type":
+      case "xp":
+      case "cash":
+        {
+          builder = builder.set(column).to(Integer.parseInt(safeMapLookup(params, "to")));
+          break;
+        }
+      case "ts":
+        {
+          builder = builder.set(column).to(Timestamp.valueOf(safeMapLookup(params, "to")));
+          break;
+        }
+      case "email":
+      case "password":
+      case "url":
+      case "description":
+      case "name":
+        {
+          builder = builder.set(column).to(safeMapLookup(params, "to"));
+          break;
+        }
+      case "location":
+        {
+          builder = builder.set(column).to(new PGgeometry(safeMapLookup(params, "to")));
+          break;
+        }
+      default:
+        System.out.println("DEFAULT CASE HAS BEEN REACHED");
+    }
+    return builder;
+  }
+
+  private WhereClauseBuilder getWhereClause(
+      WhereClauseBuilder builder, Map<String, String> params, String column)
+      throws KeyNotFoundException, SQLException {
+    switch (column) {
+      case "player_id":
+      case "id":
+      case "type":
+      case "xp":
+      case "cash":
+        {
+          builder = builder.where(column).is(Integer.parseInt(safeMapLookup(params, "is")));
+          break;
+        }
+      case "ts":
+        {
+          builder = builder.where(column).is(Timestamp.valueOf(safeMapLookup(params, "is")));
+          break;
+        }
+      case "email":
+      case "password":
+      case "url":
+      case "description":
+      case "name":
+        {
+          builder = builder.where(column).is(safeMapLookup(params, "is"));
+          break;
+        }
+      case "location":
+        {
+          builder = builder.where(column).is(new PGgeometry(safeMapLookup(params, "is")));
+          break;
+        }
+      default:
+        System.out.println("DEFAULT CASE HAS BEEN REACHED");
+    }
+    return builder;
   }
 }

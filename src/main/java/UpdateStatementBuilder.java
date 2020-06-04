@@ -4,7 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
-public class UpdateStatementBuilder {
+public class UpdateStatementBuilder implements WhereClauseBuilder {
 
   private StringBuilder sqlUpdateStatement = new StringBuilder();
   private PreparedStatement stmt = null;
@@ -45,41 +45,47 @@ public class UpdateStatementBuilder {
     return this;
   }
 
+  @Override
   public UpdateStatementBuilder where(String whereParam) throws SQLException {
     sqlUpdateStatement.append(" WHERE ").append(whereParam).append(" = ?");
     stmt = connection.prepareStatement(sqlUpdateStatement.toString());
     return this;
   }
 
+  @Override
   public UpdateStatementBuilder is(String value) throws SQLException {
     setFirstStatementParam();
     stmt.setString(2, value);
     return this;
   }
 
+  @Override
   public UpdateStatementBuilder is(Integer value) throws SQLException {
     setFirstStatementParam();
     stmt.setInt(2, value);
     return this;
   }
 
+  @Override
   public UpdateStatementBuilder is(Timestamp value) throws SQLException {
     setFirstStatementParam();
     stmt.setTimestamp(2, value);
     return this;
   }
 
+  @Override
   public UpdateStatementBuilder is(PGgeometry value) throws SQLException {
     setFirstStatementParam();
     stmt.setObject(2, value);
     return this;
   }
 
+  @Override
   public void execute() throws SQLException {
     QueryHelpers.executeSQLStatement(stmt);
   }
 
-  public StringBuilder getSqlUpdateStatement() {
+  public StringBuilder getSQLStatement() {
     return sqlUpdateStatement;
   }
 
