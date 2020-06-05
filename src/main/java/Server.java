@@ -27,13 +27,11 @@ public class Server {
   private static final String DATABASE_ERROR = "database error";
 
   private final QueryProcessor queryProcessor;
-  private final ImageProcessor imageProcessor;
   private final HttpServer httpServer;
 
-  public Server(int port, QueryProcessor queryProcessor, ImageProcessor imageProcessor)
+  public Server(int port, QueryProcessor queryProcessor)
       throws IOException {
     this.queryProcessor = queryProcessor;
-    this.imageProcessor = imageProcessor;
     this.httpServer = HttpServer.create(new InetSocketAddress(port), 0);
     /* QueryProcessor contexts */
     HttpContext insertContext = this.httpServer.createContext("/insert");
