@@ -1,8 +1,6 @@
 import org.postgis.PGgeometry;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+
+import java.sql.*;
 
 public class DeleteStatementBuilder implements WhereClauseBuilder {
 
@@ -56,11 +54,16 @@ public class DeleteStatementBuilder implements WhereClauseBuilder {
     if (!sqlDeleteStatement.toString().contains("WHERE")) {
       stmt = connection.prepareStatement(sqlDeleteStatement.toString());
     }
-    QueryHelpers.executeSQLStatement(stmt);
+    DBInterfaceHelpers.executeSQLStatement(stmt);
   }
 
   @Override
   public StringBuilder getSQLStatement() {
     return sqlDeleteStatement;
+  }
+
+  @Override
+  public ResultSet executeSelect() throws SQLException {
+    return null;
   }
 }
