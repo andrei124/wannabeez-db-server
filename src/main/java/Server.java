@@ -1,24 +1,18 @@
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileWriter;
+import org.postgis.PGgeometry;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.net.URLDecoder;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-import org.postgis.PGgeometry;
 
 public class Server {
 
@@ -45,14 +39,11 @@ public class Server {
     updateContext.setHandler(this::handleUpdate);
     HttpContext deleteContext = this.httpServer.createContext("/delete");
     deleteContext.setHandler(this::handleDelete);
-
-    /* ImageProcessor contexts */
-    HttpContext uploadContext = this.httpServer.createContext("/upload");
-    uploadContext.setHandler(this::handleUpload);
   }
 
-  public static Map<String, String> parseQuery(String url) {
+  public static Map<String, String> parseQuery(String url) throws UnsupportedEncodingException {
     Map<String, String> queryPairs = new HashMap<>();
+    url = URLDecoder.decode(url, "UTF-8");
     if (url != null) {
       String[] pairs = url.split("&");
       for (String pair : pairs) {
@@ -73,34 +64,6 @@ public class Server {
     this.queryProcessor.connect();
     this.httpServer.start();
     System.out.println("Server started");
-  }
-
-  private String imagesPath = "images/";
-
-  private void handleUpload(HttpExchange exchange) throws IOException {
-    URI requestURI = exchange.getRequestURI();
-    byte[] form = exchange.getRequestBody().readAllBytes();
-    System.out.println(form.length);
-
-    try {
-      // FileWriter myWriter = new FileWriter("filename.png");
-      String ts = new Timestamp(System.currentTimeMillis()).toString().replace(" ", "_");
-      String path = imagesPath + "image" + ts + ".png";
-      Files.write(Paths.get(path), form);
-      this.queryProcessor.addNewImageMetaData(Timestamp.valueOf(LocalDateTime.now()), 0, path);
-
-      // myWriter.close();
-      System.out.println("Successfully wrote to the file.");
-    } catch (IOException | SQLException e) {
-      System.out.println("An error occurred.");
-      e.printStackTrace();
-    }
-
-    System.out.println(Integer.toHexString(form[0]));
-    System.out.println(new String(exchange.getRequestBody().readAllBytes()));
-
-    String byteArray = requestURI.getPath().replace("/upload/", "");
-    System.out.println(byteArray);
   }
 
   private void handleInsert(HttpExchange exchange) throws IOException {
