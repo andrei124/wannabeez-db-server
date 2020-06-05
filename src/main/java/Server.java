@@ -1,6 +1,8 @@
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.postgis.PGgeometry;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -9,11 +11,13 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 public class Server {
 
@@ -170,18 +174,21 @@ public class Server {
         System.out.println("Simple Select query requested");
       }
       SelectQueryBuilder queryBuilder = queryProcessor.select(columnsToBeQueried).from(table);
-      if(indexColumn != null) {
+      if (indexColumn != null) {
         queryBuilder = (SelectQueryBuilder) getWhereClause(queryBuilder, params, indexColumn);
       }
 
       System.out.println(queryBuilder.getSQLStatement().toString());
-      queryBuilder.executeSelect();
+      ResultSet rs = queryBuilder.executeSelect();
       response = SUCCESS;
+      response = response + "\n" + getJSONfromResultSet(rs);
     } catch (KeyNotFoundException e) {
       // catch missing params
       response = BAD_PARAMS;
     } catch (SQLException e) {
       response = DATABASE_ERROR;
+    } catch (JSONException e) {
+      response += "\nCould not retrieve JSON Object...Exception caught...";
     }
 
     // send response
@@ -189,6 +196,28 @@ public class Server {
     OutputStream os = exchange.getResponseBody();
     os.write(response.getBytes());
     os.close();
+  }
+
+  private String getJSONfromResultSet(ResultSet rs) throws SQLException, JSONException {
+    List<JSONObject> jsonObjectList = new ArrayList<>();
+    List<String> columnNames = new ArrayList<>();
+    ResultSetMetaData rsMetaData = rs.getMetaData();
+    int columnsSelected = rsMetaData.getColumnCount();
+
+    for(int i = 0; i < columnsSelected; i++) {
+      columnNames.add(i, rsMetaData.getColumnName(i + 1));
+    }
+
+    while (rs.next()) {
+      JSONObject jsonObject = new JSONObject();
+      for (int i = 0; i < columnsSelected; i++) {
+        String key = columnNames.get(i);
+        String value = rs.getString(i + 1);
+        jsonObject.put(key, value);
+      }
+      jsonObjectList.add(jsonObject);
+    }
+    return jsonObjectList.toString();
   }
 
   private void handleUpdate(HttpExchange exchange) throws IOException {
@@ -245,7 +274,7 @@ public class Server {
 
       DeleteStatementBuilder builder = queryProcessor.delete().from(table);
 
-      if(indexColumn != null) {
+      if (indexColumn != null) {
         builder = (DeleteStatementBuilder) getWhereClause(builder, params, indexColumn);
       }
       System.out.println(builder.getSQLStatement().toString());
