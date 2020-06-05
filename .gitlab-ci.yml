@@ -18,8 +18,8 @@ deploy:
   script:
     - cp ~/config.properties ./
     - export running=$(docker ps -a |grep dbi |awk '{print $1}')
-    - if [ -z $running]; then docker stop $running; fi
-    - if [ -z $running]; then docker rm $running; fi
+    - if [ -z "$running" ]; then docker stop $running; fi
+    - if [ -z "$running" ]; then docker rm $running; fi
     - docker build --tag dbi .
     - docker run -d -p 42069:8500 dbi
   only:
