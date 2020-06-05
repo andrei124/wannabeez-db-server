@@ -1,5 +1,6 @@
 import org.postgis.PGgeometry;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
@@ -16,6 +17,8 @@ public interface WhereClauseBuilder {
   WhereClauseBuilder is(PGgeometry value) throws SQLException;
 
   void execute() throws SQLException;
+
+  ResultSet executeSelect() throws SQLException;
 
   StringBuilder getSQLStatement();
 }

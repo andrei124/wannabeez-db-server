@@ -8,10 +8,12 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URLDecoder;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 public class Server {
 
@@ -152,24 +154,34 @@ public class Server {
   private void handleSelect(HttpExchange exchange) throws IOException {
     // extract info from request
     URI requestURI = exchange.getRequestURI();
-    String method = requestURI.getPath().replace("/select/", "");
+    String rawColumns = requestURI.getPath().replace("/select/", "");
     Map<String, String> params = parseQuery(requestURI.getQuery());
 
     String response = METHOD_NOT_FOUND;
     try {
-      // check which method is being used
-      switch (method) {
-        case "gallery":
-          {
-            System.out.println("gallery select");
-            safeMapLookup(params, "asdfasdf");
-            response = SUCCESS;
-            break;
-          }
+      String columnsToBeQueried = rawColumns.replace("&", ",");
+      String table = safeMapLookup(params, "from");
+      String indexColumn = null;
+
+      try {
+        indexColumn = safeMapLookup(params, "where");
+        System.out.println("Select query with WHERE clause requested");
+      } catch (KeyNotFoundException e) {
+        System.out.println("Simple Select query requested");
       }
+      SelectQueryBuilder queryBuilder = queryProcessor.select(columnsToBeQueried).from(table);
+      if(indexColumn != null) {
+        queryBuilder = (SelectQueryBuilder) getWhereClause(queryBuilder, params, indexColumn);
+      }
+
+      System.out.println(queryBuilder.getSQLStatement().toString());
+      queryBuilder.executeSelect();
+      response = SUCCESS;
     } catch (KeyNotFoundException e) {
       // catch missing params
       response = BAD_PARAMS;
+    } catch (SQLException e) {
+      response = DATABASE_ERROR;
     }
 
     // send response

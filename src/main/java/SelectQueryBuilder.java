@@ -1,7 +1,7 @@
 import org.postgis.PGgeometry;
 import java.sql.*;
 
-public class SelectQueryBuilder {
+public class SelectQueryBuilder implements WhereClauseBuilder {
 
   private StringBuilder sqlSelectQuery = new StringBuilder();
   private PreparedStatement stmt = null;
@@ -46,10 +46,21 @@ public class SelectQueryBuilder {
     return this;
   }
 
-  public ResultSet execute() throws SQLException {
+
+  public ResultSet executeSelect() throws SQLException {
     if (!sqlSelectQuery.toString().contains("WHERE")) {
       stmt = connection.prepareStatement(sqlSelectQuery.toString());
     }
     return DBInterfaceHelpers.getResultSet(stmt);
+  }
+
+  @Override
+  public StringBuilder getSQLStatement() {
+    return sqlSelectQuery;
+  }
+
+  @Override
+  public void execute() throws SQLException {
+    // Does nothing
   }
 }

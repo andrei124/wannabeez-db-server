@@ -1,8 +1,6 @@
 import org.postgis.PGgeometry;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+
+import java.sql.*;
 
 public class UpdateStatementBuilder implements WhereClauseBuilder {
 
@@ -99,5 +97,10 @@ public class UpdateStatementBuilder implements WhereClauseBuilder {
     } else if (toPGeometry != null) {
       stmt.setObject(1, toPGeometry);
     }
+  }
+
+  @Override
+  public ResultSet executeSelect() throws SQLException {
+    return null;
   }
 }
