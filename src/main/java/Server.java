@@ -2,7 +2,6 @@ import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import org.postgis.PGgeometry;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
@@ -222,16 +221,22 @@ public class Server {
 
     String response = METHOD_NOT_FOUND;
     try {
-      System.out.println("Delete statement invoked");
       String table = safeMapLookup(params, "from");
-      String indexColumn = safeMapLookup(params, "where");
+      String indexColumn = null;
+
+      try {
+        indexColumn = safeMapLookup(params, "where");
+        System.out.println("Delete statement with WHERE clause invoked");
+      } catch (KeyNotFoundException e) {
+        System.out.println("Simple Delete statement invoked");
+      }
 
       DeleteStatementBuilder builder = queryProcessor.delete().from(table);
-      ;
-      builder = (DeleteStatementBuilder) getWhereClause(builder, params, indexColumn);
 
+      if(indexColumn != null) {
+        builder = (DeleteStatementBuilder) getWhereClause(builder, params, indexColumn);
+      }
       System.out.println(builder.getSQLStatement().toString());
-
       builder.execute();
       response = SUCCESS;
     } catch (KeyNotFoundException e) {

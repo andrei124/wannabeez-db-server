@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
-public class QueryHelpers {
+public class DBInterfaceHelpers {
 
   /**
    * Helper method for executing an SQL Prepared Statement

@@ -11,7 +11,7 @@ public class SelectQueryBuilder {
     this.connection = connection;
     sqlSelectQuery
         .append("SELECT ")
-        .append(QueryHelpers.getColumnsToBeQueried(columns))
+        .append(DBInterfaceHelpers.getColumnsToBeQueried(columns))
         .append(" ");
   }
 
@@ -50,6 +50,6 @@ public class SelectQueryBuilder {
     if (!sqlSelectQuery.toString().contains("WHERE")) {
       stmt = connection.prepareStatement(sqlSelectQuery.toString());
     }
-    return QueryHelpers.getResultSet(stmt);
+    return DBInterfaceHelpers.getResultSet(stmt);
   }
 }

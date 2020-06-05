@@ -99,7 +99,7 @@ public class QueryProcessor {
             "insert into " + tableName + " (\"email\", \"password\") " + " values(?, ?)");
     stmt.setString(1, email);
     stmt.setString(2, password);
-    QueryHelpers.executeSQLStatement(stmt);
+    DBInterfaceHelpers.executeSQLStatement(stmt);
   }
 
   /** Insert SQL Prepared statement for PLAYER_STATS * */
@@ -114,7 +114,7 @@ public class QueryProcessor {
     stmt.setInt(1, player_id);
     stmt.setInt(2, xp);
     stmt.setInt(3, cash);
-    QueryHelpers.executeSQLStatement(stmt);
+    DBInterfaceHelpers.executeSQLStatement(stmt);
   }
 
   /** Insert SQL Prepared statement for GALLERY * */
@@ -130,7 +130,7 @@ public class QueryProcessor {
     stmt.setTimestamp(1, ts);
     stmt.setInt(2, playerId);
     stmt.setString(3, url);
-    QueryHelpers.executeSQLStatement(stmt);
+    DBInterfaceHelpers.executeSQLStatement(stmt);
   }
 
   /** Insert SQL Prepared statement for LOCATION * */
@@ -143,7 +143,7 @@ public class QueryProcessor {
         connection.prepareStatement("insert into " + tableName + " values(?, ?)");
     stmt.setInt(1, imageId);
     stmt.setObject(2, location);
-    QueryHelpers.executeSQLStatement(stmt);
+    DBInterfaceHelpers.executeSQLStatement(stmt);
   }
 
   /** Insert SQL Prepared statement for LANDMARK * */
@@ -163,7 +163,7 @@ public class QueryProcessor {
     stmt.setObject(1, location);
     stmt.setInt(2, type);
     stmt.setString(3, description);
-    QueryHelpers.executeSQLStatement(stmt);
+    DBInterfaceHelpers.executeSQLStatement(stmt);
   }
 
   /** Insert SQL Prepared statement for LANDMARK_TYPE * */
@@ -175,7 +175,7 @@ public class QueryProcessor {
     PreparedStatement stmt =
         connection.prepareStatement("insert into " + tableName + " (\"name\") " + " values(?)");
     stmt.setString(1, name);
-    QueryHelpers.executeSQLStatement(stmt);
+    DBInterfaceHelpers.executeSQLStatement(stmt);
   }
 
   /**

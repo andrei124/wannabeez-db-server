@@ -82,7 +82,7 @@ public class UpdateStatementBuilder implements WhereClauseBuilder {
 
   @Override
   public void execute() throws SQLException {
-    QueryHelpers.executeSQLStatement(stmt);
+    DBInterfaceHelpers.executeSQLStatement(stmt);
   }
 
   public StringBuilder getSQLStatement() {

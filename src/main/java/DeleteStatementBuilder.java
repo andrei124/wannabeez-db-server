@@ -56,7 +56,7 @@ public class DeleteStatementBuilder implements WhereClauseBuilder {
     if (!sqlDeleteStatement.toString().contains("WHERE")) {
       stmt = connection.prepareStatement(sqlDeleteStatement.toString());
     }
-    QueryHelpers.executeSQLStatement(stmt);
+    DBInterfaceHelpers.executeSQLStatement(stmt);
   }
 
   @Override
