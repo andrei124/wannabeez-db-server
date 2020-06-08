@@ -6,6 +6,6 @@ COPY pom.xml .
 COPY session.sh .
 COPY config.properties ./src
 
-RUN mvn install
+RUN mvn compile install assembly:single
 CMD ["sh", "session.sh"]
 
