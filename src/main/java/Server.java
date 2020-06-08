@@ -234,11 +234,13 @@ public class Server {
     String response = DBInterfaceHelpers.METHOD_NOT_FOUND;
     try {
       // Geolocation query must contain location parameter, throw exception otherwise
-      String myLocation = DBInterfaceHelpers.safeMapLookup(params, "location");
+      Double latitude = Double.parseDouble(DBInterfaceHelpers.safeMapLookup(params, "lat"));
+      Double longitude = Double.parseDouble(DBInterfaceHelpers.safeMapLookup(params, "lon"));
+      Double radius = Double.parseDouble(DBInterfaceHelpers.safeMapLookup(params, "rad"));
 
       System.out.println("Spawn from DB invoked");
       SelectQueryBuilder queryBuilder =
-          queryProcessor.select("*").from("Landmark").whereSTContains(new PGgeometry((myLocation)));
+          queryProcessor.select("*").from("Landmark").whereSTContains(latitude, longitude, radius);
 
       System.out.println(queryBuilder.getSQLStatement().toString());
       ResultSet rs = queryBuilder.executeSelect();

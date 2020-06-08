@@ -27,12 +27,17 @@ public class SelectQueryBuilder implements WhereClauseBuilder {
     return this;
   }
 
-  public SelectQueryBuilder whereSTContains(PGgeometry container) throws SQLException {
+  public SelectQueryBuilder whereSTContains(Double x, Double y, Double radius) throws SQLException {
     sqlSelectQuery
         .append(" WHERE ")
-        .append("ST_Contains(ST_GeomFromText('")
-        .append(container.toString())
-        .append("'), Landmark.location)");
+        .append("ST_Contains(ST_Buffer(ST_MakePoint(")
+        .append(x)
+        .append(", ")
+        .append(y)
+        .append(")")
+        .append("::geography, ")
+        .append(radius)
+        .append(")::geometry, Landmark.location)");
     stmt = connection.prepareStatement(sqlSelectQuery.toString());
     return this;
   }
