@@ -28,6 +28,8 @@ public class Server {
     updateContext.setHandler(this::handleUpdate);
     HttpContext deleteContext = this.httpServer.createContext("/delete");
     deleteContext.setHandler(this::handleDelete);
+    HttpContext spawnContext = this.httpServer.createContext("/spawn");
+    spawnContext.setHandler(this::handleSpawn);
   }
 
   public void start() {
@@ -35,6 +37,7 @@ public class Server {
     this.httpServer.start();
     System.out.println("Server started");
   }
+
 
   private void handleInsert(HttpExchange exchange) throws IOException {
     // extract info from request
@@ -113,6 +116,7 @@ public class Server {
     DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
   }
 
+
   private void handleSelect(HttpExchange exchange) throws IOException {
     // extract info from request
     URI requestURI = exchange.getRequestURI();
@@ -185,6 +189,7 @@ public class Server {
     DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
   }
 
+
   private void handleDelete(HttpExchange exchange) throws IOException {
     // extract info from request
     URI requestURI = exchange.getRequestURI();
@@ -218,6 +223,38 @@ public class Server {
       response = DBInterfaceHelpers.BAD_PARAMS;
     } catch (SQLException e) {
       response = DBInterfaceHelpers.DATABASE_ERROR;
+    }
+    // send response
+    DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
+  }
+
+
+  private void handleSpawn(HttpExchange exchange) throws IOException {
+    // extract info from request
+    URI requestURI = exchange.getRequestURI();
+    requestURI.getPath().replace("/spawn/", "");
+    Map<String, String> params = DBInterfaceHelpers.parseQuery(requestURI.getQuery());
+
+    String response = DBInterfaceHelpers.METHOD_NOT_FOUND;
+    try {
+      // Geolocation query must contain location parameter, throw exception otherwise
+      String myLocation = DBInterfaceHelpers.safeMapLookup(params, "location");
+
+      System.out.println("Spawn from DB invoked");
+      SelectQueryBuilder queryBuilder =
+              queryProcessor.select("*").from("Location").whereSTContains(new PGgeometry((myLocation)));
+
+      System.out.println(queryBuilder.getSQLStatement().toString());
+      ResultSet rs = queryBuilder.executeSelect();
+      response = DBInterfaceHelpers.SUCCESS;
+      response = response + "\n" + DBInterfaceHelpers.getJSONfromResultSet(rs);
+    } catch (KeyNotFoundException e) {
+      // catch missing params
+      response = DBInterfaceHelpers.BAD_PARAMS;
+    } catch (SQLException e) {
+      response = DBInterfaceHelpers.DATABASE_ERROR;
+    } catch (JSONException e) {
+      response += "\nCould not retrieve JSON Object...Exception caught...";
     }
     // send response
     DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
