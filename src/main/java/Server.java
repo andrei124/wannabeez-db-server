@@ -38,7 +38,6 @@ public class Server {
     System.out.println("Server started");
   }
 
-
   private void handleInsert(HttpExchange exchange) throws IOException {
     // extract info from request
     URI requestURI = exchange.getRequestURI();
@@ -116,7 +115,6 @@ public class Server {
     DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
   }
 
-
   private void handleSelect(HttpExchange exchange) throws IOException {
     // extract info from request
     URI requestURI = exchange.getRequestURI();
@@ -189,7 +187,6 @@ public class Server {
     DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
   }
 
-
   private void handleDelete(HttpExchange exchange) throws IOException {
     // extract info from request
     URI requestURI = exchange.getRequestURI();
@@ -228,7 +225,6 @@ public class Server {
     DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
   }
 
-
   private void handleSpawn(HttpExchange exchange) throws IOException {
     // extract info from request
     URI requestURI = exchange.getRequestURI();
@@ -242,7 +238,7 @@ public class Server {
 
       System.out.println("Spawn from DB invoked");
       SelectQueryBuilder queryBuilder =
-              queryProcessor.select("*").from("Location").whereSTContains(new PGgeometry((myLocation)));
+          queryProcessor.select("*").from("Landmark").whereSTContains(new PGgeometry((myLocation)));
 
       System.out.println(queryBuilder.getSQLStatement().toString());
       ResultSet rs = queryBuilder.executeSelect();

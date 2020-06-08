@@ -32,7 +32,7 @@ public class SelectQueryBuilder implements WhereClauseBuilder {
         .append(" WHERE ")
         .append("ST_Contains(ST_GeomFromText('")
         .append(container.toString())
-        .append("'), Location.location)");
+        .append("'), Landmark.location)");
     stmt = connection.prepareStatement(sqlSelectQuery.toString());
     return this;
   }
