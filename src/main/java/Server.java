@@ -32,9 +32,7 @@ public class Server {
     geoSelectContext.setHandler(this::handleGeoSelect);
   }
 
-  /**
-   * Method for server boot
-   */
+  /** Method for server boot */
   public void start() {
     this.queryProcessor.connect();
     this.httpServer.start();
@@ -43,6 +41,7 @@ public class Server {
 
   /**
    * Handler for Insert into DB Http Request
+   *
    * @param exchange -- HttpExchange to be processed
    * @throws IOException
    */
@@ -112,6 +111,21 @@ public class Server {
             response = DBInterfaceHelpers.SUCCESS;
             break;
           }
+        case "quest":
+          {
+            System.out.println("quest insertion");
+            break;
+          }
+        case "quest_location":
+          {
+            System.out.println("quest_location insertion");
+            break;
+          }
+        case "quest_type":
+          {
+            System.out.println("quest_type insertion");
+            break;
+          }
       }
     } catch (KeyNotFoundException | IllegalArgumentException e) {
       // catch missing params
@@ -123,9 +137,9 @@ public class Server {
     DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
   }
 
-
   /**
    * Handler for Select Query from DB Http Request
+   *
    * @param exchange -- HttpExchange to be processed
    * @throws IOException
    */
@@ -166,7 +180,7 @@ public class Server {
         tableToJoin = DBInterfaceHelpers.safeMapLookup(params, "join");
         joinPresent = true;
         // Cannot have both JOIN and WHERE clause
-        if(indexColumn != null) {
+        if (indexColumn != null) {
           validQuery = false;
           response = DBInterfaceHelpers.BAD_PARAMS;
           System.out.println("Query badly written...Cannot have both JOIN and WHERE");
@@ -175,7 +189,7 @@ public class Server {
       } catch (KeyNotFoundException e) {
         System.out.println("No Join query");
       }
-      if(joinPresent && validQuery) {
+      if (joinPresent && validQuery) {
         queryBuilder = queryBuilder.join(tableToJoin);
         try {
           lhsAttr = DBInterfaceHelpers.safeMapLookup(params, "on");
@@ -188,7 +202,7 @@ public class Server {
         }
       }
 
-      if(validQuery) {
+      if (validQuery) {
         // Print the SQL Query
         System.out.println(queryBuilder.getSQLStatement().toString());
         ResultSet rs = queryBuilder.executeSelect();
@@ -207,9 +221,9 @@ public class Server {
     DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
   }
 
-
   /**
    * Handler for Update a record into DB Http Request
+   *
    * @param exchange -- HttpExchange to be processed
    * @throws IOException
    */
@@ -244,9 +258,9 @@ public class Server {
     DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
   }
 
-
   /**
    * Handler for Delete from DB Http Request
+   *
    * @param exchange -- HttpExchange to be processed
    * @throws IOException
    */
@@ -288,9 +302,9 @@ public class Server {
     DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
   }
 
-
   /**
    * Handler for Geolocation Query from DB Http Request
+   *
    * @param exchange -- HttpExchange to be processed
    * @throws IOException
    */
@@ -315,7 +329,9 @@ public class Server {
         case "landmark":
           System.out.println("try to spawn landmarks");
           queryBuilder =
-              queryProcessor.select("*").from("landmark")
+              queryProcessor
+                  .select("*")
+                  .from("landmark")
                   .withinRadiusOf(latitude, longitude, radius, "landmark", "location");
           System.out.println(queryBuilder.getSQLStatement().toString());
           rs = queryBuilder.executeSelect();
@@ -323,8 +339,10 @@ public class Server {
         case "quest":
           System.out.println("try to spawn quests");
           queryBuilder =
-              queryProcessor.select("*").from("quest").withinRadiusOf(latitude, longitude, radius,
-                  "quest_location", "location");
+              queryProcessor
+                  .select("*")
+                  .from("quest")
+                  .withinRadiusOf(latitude, longitude, radius, "quest_location", "location");
           System.out.println(queryBuilder.getSQLStatement().toString());
           rs = queryBuilder.executeSelect();
           break;
