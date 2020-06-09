@@ -71,6 +71,21 @@ public class SelectQueryBuilder implements WhereClauseBuilder {
     return this;
   }
 
+  public SelectQueryBuilder join(String table) {
+    sqlSelectQuery.append(" JOIN ").append(table);
+    return this;
+  }
+
+  public SelectQueryBuilder on(String attribute) {
+    sqlSelectQuery.append(" ON ").append(attribute);
+    return this;
+  }
+
+  public SelectQueryBuilder equals(String attribute) {
+    sqlSelectQuery.append(" = ").append(attribute);
+    return this;
+  }
+
   @Override
   public ResultSet executeSelect() throws SQLException {
     if (!sqlSelectQuery.toString().contains("WHERE")) {
