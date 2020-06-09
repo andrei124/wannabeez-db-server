@@ -27,7 +27,8 @@ public class SelectQueryBuilder implements WhereClauseBuilder {
     return this;
   }
 
-  public SelectQueryBuilder whereSTContains(Double x, Double y, Double radius) throws SQLException {
+  public SelectQueryBuilder withinRadiusOf
+      (Double x, Double y, Double radius, String table, String column) throws SQLException {
     sqlSelectQuery
         .append(" WHERE ")
         .append("ST_Contains(ST_Buffer(ST_MakePoint(")
@@ -37,7 +38,11 @@ public class SelectQueryBuilder implements WhereClauseBuilder {
         .append(")")
         .append("::geography, ")
         .append(radius)
-        .append(")::geometry, Landmark.location)");
+        .append(")::geometry, ")
+        .append(table)
+        .append(".")
+        .append(column)
+        .append(")");
     stmt = connection.prepareStatement(sqlSelectQuery.toString());
     return this;
   }
@@ -66,9 +71,24 @@ public class SelectQueryBuilder implements WhereClauseBuilder {
     return this;
   }
 
+  public SelectQueryBuilder join(String table) {
+    sqlSelectQuery.append(" JOIN ").append(table);
+    return this;
+  }
+
+  public SelectQueryBuilder on(String attribute) {
+    sqlSelectQuery.append(" ON ").append(attribute);
+    return this;
+  }
+
+  public SelectQueryBuilder equals(String attribute) {
+    sqlSelectQuery.append(" = ").append(attribute);
+    return this;
+  }
+
   @Override
   public ResultSet executeSelect() throws SQLException {
-    if (!sqlSelectQuery.toString().contains("WHERE")) {
+    if (stmt == null) {
       stmt = connection.prepareStatement(sqlSelectQuery.toString());
     }
     return DBInterfaceHelpers.getResultSet(stmt);

@@ -178,6 +178,35 @@ public class QueryProcessor {
     DBInterfaceHelpers.executeSQLStatement(stmt);
   }
 
+  /** Insert SQL Prepared Statement for QUEST * */
+  public void addNewQuest(Integer type, String name, String description) throws SQLException {
+    insert("Quest", type, name, description);
+  }
+
+  private void insert(String tableName, Integer type, String name, String description)
+      throws SQLException {
+    PreparedStatement stmt =
+        connection.prepareStatement(
+            "insert into "
+                + tableName
+                + " (\"type\", \"name\", \"description\") "
+                + " values(?, ?, ?)");
+    stmt.setInt(1, type);
+    stmt.setString(2, name);
+    stmt.setString(3, description);
+    DBInterfaceHelpers.executeSQLStatement(stmt);
+  }
+
+  /** Insert SQL Prepared Statements for QUEST_TYPE * */
+  public void addNewQuestType(String name) throws SQLException {
+    insert("Quest_Type", name);
+  }
+
+  /** Insert SQL Prepared Statement for QUEST_LOCATION * */
+  public void addNewQuestLocation(Integer questId, PGgeometry location) throws SQLException {
+    insert("Quest_Location", questId, location);
+  }
+
   /**
    * Method for SQL SELECT Query
    *

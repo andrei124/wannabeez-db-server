@@ -28,16 +28,23 @@ public class Server {
     updateContext.setHandler(this::handleUpdate);
     HttpContext deleteContext = this.httpServer.createContext("/delete");
     deleteContext.setHandler(this::handleDelete);
-    HttpContext spawnContext = this.httpServer.createContext("/spawn");
-    spawnContext.setHandler(this::handleSpawn);
+    HttpContext geoSelectContext = this.httpServer.createContext("/geoSelect");
+    geoSelectContext.setHandler(this::handleGeoSelect);
   }
 
+  /** Method for server boot */
   public void start() {
     this.queryProcessor.connect();
     this.httpServer.start();
     System.out.println("Server started");
   }
 
+  /**
+   * Handler for Insert into DB Http Request
+   *
+   * @param exchange -- HttpExchange to be processed
+   * @throws IOException
+   */
   private void handleInsert(HttpExchange exchange) throws IOException {
     // extract info from request
     URI requestURI = exchange.getRequestURI();
@@ -104,6 +111,32 @@ public class Server {
             response = DBInterfaceHelpers.SUCCESS;
             break;
           }
+        case "quest":
+          {
+            System.out.println("quest insertion");
+            this.queryProcessor.addNewQuest(
+                Integer.parseInt(DBInterfaceHelpers.safeMapLookup(params, "type")),
+                DBInterfaceHelpers.safeMapLookup(params, "name"),
+                DBInterfaceHelpers.safeMapLookup(params, "description"));
+            response = DBInterfaceHelpers.SUCCESS;
+            break;
+          }
+        case "quest_location":
+          {
+            System.out.println("quest_location insertion");
+            this.queryProcessor.addNewQuestLocation(
+                Integer.parseInt(DBInterfaceHelpers.safeMapLookup(params, "questId")),
+                new PGgeometry(DBInterfaceHelpers.safeMapLookup(params, "location")));
+            response = DBInterfaceHelpers.SUCCESS;
+            break;
+          }
+        case "quest_type":
+          {
+            System.out.println("quest_type insertion");
+            this.queryProcessor.addNewQuestType(DBInterfaceHelpers.safeMapLookup(params, "name"));
+            response = DBInterfaceHelpers.SUCCESS;
+            break;
+          }
       }
     } catch (KeyNotFoundException | IllegalArgumentException e) {
       // catch missing params
@@ -115,6 +148,12 @@ public class Server {
     DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
   }
 
+  /**
+   * Handler for Select Query from DB Http Request
+   *
+   * @param exchange -- HttpExchange to be processed
+   * @throws IOException
+   */
   private void handleSelect(HttpExchange exchange) throws IOException {
     // extract info from request
     URI requestURI = exchange.getRequestURI();
@@ -126,24 +165,61 @@ public class Server {
       String columnsToBeQueried = rawColumns.replace("&", ",");
       String table = DBInterfaceHelpers.safeMapLookup(params, "from");
       String indexColumn = null;
+      String tableToJoin = null;
+      String lhsAttr = null;
+      String rhsAttr = null;
+      boolean validQuery = true;
+      boolean joinPresent = false;
 
+      SelectQueryBuilder queryBuilder = queryProcessor.select(columnsToBeQueried).from(table);
+
+      // Check for WHERE clause
       try {
         indexColumn = DBInterfaceHelpers.safeMapLookup(params, "where");
         System.out.println("Select query with WHERE clause requested");
       } catch (KeyNotFoundException e) {
         System.out.println("Simple Select query requested");
       }
-      SelectQueryBuilder queryBuilder = queryProcessor.select(columnsToBeQueried).from(table);
       if (indexColumn != null) {
         queryBuilder =
             (SelectQueryBuilder)
                 DBInterfaceHelpers.getWhereClause(queryBuilder, params, indexColumn);
       }
 
-      System.out.println(queryBuilder.getSQLStatement().toString());
-      ResultSet rs = queryBuilder.executeSelect();
-      response = DBInterfaceHelpers.SUCCESS;
-      response = response + "\n" + DBInterfaceHelpers.getJSONfromResultSet(rs);
+      // Check for JOIN clause
+      try {
+        tableToJoin = DBInterfaceHelpers.safeMapLookup(params, "join");
+        joinPresent = true;
+        // Cannot have both JOIN and WHERE clause
+        if (indexColumn != null) {
+          validQuery = false;
+          response = DBInterfaceHelpers.BAD_PARAMS;
+          System.out.println("Query badly written...Cannot have both JOIN and WHERE");
+        }
+        System.out.println("Select query with JOIN clause requested");
+      } catch (KeyNotFoundException e) {
+        System.out.println("No Join query");
+      }
+      if (joinPresent && validQuery) {
+        queryBuilder = queryBuilder.join(tableToJoin);
+        try {
+          lhsAttr = DBInterfaceHelpers.safeMapLookup(params, "on");
+          rhsAttr = DBInterfaceHelpers.safeMapLookup(params, "equals");
+          queryBuilder = queryBuilder.on(lhsAttr).equals(rhsAttr);
+        } catch (KeyNotFoundException e) {
+          System.out.println("Syntax error in Join query");
+          response = DBInterfaceHelpers.BAD_PARAMS;
+          validQuery = false;
+        }
+      }
+
+      if (validQuery) {
+        // Print the SQL Query
+        System.out.println(queryBuilder.getSQLStatement().toString());
+        ResultSet rs = queryBuilder.executeSelect();
+        response = DBInterfaceHelpers.SUCCESS;
+        response = response + "\n" + DBInterfaceHelpers.getJSONfromResultSet(rs);
+      }
     } catch (KeyNotFoundException e) {
       // catch missing params
       response = DBInterfaceHelpers.BAD_PARAMS;
@@ -156,6 +232,12 @@ public class Server {
     DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
   }
 
+  /**
+   * Handler for Update a record into DB Http Request
+   *
+   * @param exchange -- HttpExchange to be processed
+   * @throws IOException
+   */
   private void handleUpdate(HttpExchange exchange) throws IOException {
     // extract info from request
     URI requestURI = exchange.getRequestURI();
@@ -187,6 +269,12 @@ public class Server {
     DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
   }
 
+  /**
+   * Handler for Delete from DB Http Request
+   *
+   * @param exchange -- HttpExchange to be processed
+   * @throws IOException
+   */
   private void handleDelete(HttpExchange exchange) throws IOException {
     // extract info from request
     URI requestURI = exchange.getRequestURI();
@@ -225,27 +313,55 @@ public class Server {
     DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
   }
 
-  private void handleSpawn(HttpExchange exchange) throws IOException {
+  /**
+   * Handler for Geolocation Query from DB Http Request
+   *
+   * @param exchange -- HttpExchange to be processed
+   * @throws IOException
+   */
+  private void handleGeoSelect(HttpExchange exchange) throws IOException {
     // extract info from request
     URI requestURI = exchange.getRequestURI();
-    requestURI.getPath().replace("/spawn/", "");
+    String method = requestURI.getPath().replace("/geoSelect/", "");
     Map<String, String> params = DBInterfaceHelpers.parseQuery(requestURI.getQuery());
 
     String response = DBInterfaceHelpers.METHOD_NOT_FOUND;
     try {
+
       // Geolocation query must contain location parameter, throw exception otherwise
       Double latitude = Double.parseDouble(DBInterfaceHelpers.safeMapLookup(params, "lat"));
       Double longitude = Double.parseDouble(DBInterfaceHelpers.safeMapLookup(params, "lon"));
       Double radius = Double.parseDouble(DBInterfaceHelpers.safeMapLookup(params, "rad"));
 
-      System.out.println("Spawn from DB invoked");
-      SelectQueryBuilder queryBuilder =
-          queryProcessor.select("*").from("Landmark").whereSTContains(latitude, longitude, radius);
+      ResultSet rs = null;
+      SelectQueryBuilder queryBuilder;
 
-      System.out.println(queryBuilder.getSQLStatement().toString());
-      ResultSet rs = queryBuilder.executeSelect();
-      response = DBInterfaceHelpers.SUCCESS;
-      response = response + "\n" + DBInterfaceHelpers.getJSONfromResultSet(rs);
+      switch (method) {
+        case "landmark":
+          System.out.println("try to spawn landmarks");
+          queryBuilder =
+              queryProcessor
+                  .select("*")
+                  .from("landmark")
+                  .withinRadiusOf(latitude, longitude, radius, "landmark", "location");
+          System.out.println(queryBuilder.getSQLStatement().toString());
+          rs = queryBuilder.executeSelect();
+          break;
+        case "quest":
+          System.out.println("try to spawn quests");
+          queryBuilder =
+              queryProcessor
+                  .select("*")
+                  .from("quest")
+                  .withinRadiusOf(latitude, longitude, radius, "quest_location", "location");
+          System.out.println(queryBuilder.getSQLStatement().toString());
+          rs = queryBuilder.executeSelect();
+          break;
+      }
+      if (rs != null) {
+        response = DBInterfaceHelpers.SUCCESS;
+        response = response + "\n" + DBInterfaceHelpers.getJSONfromResultSet(rs);
+      }
     } catch (KeyNotFoundException e) {
       // catch missing params
       response = DBInterfaceHelpers.BAD_PARAMS;

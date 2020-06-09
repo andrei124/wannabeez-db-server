@@ -64,7 +64,12 @@ public class QueryProcessorSelectTest {
                 .prepareStatement("SELECT player_id,url FROM Gallery WHERE ts = ?");
           }
         });
-    queryProcessor.select("player_id,url").from("Gallery").where("ts").is(exampleTS).executeSelect();
+    queryProcessor
+        .select("player_id,url")
+        .from("Gallery")
+        .where("ts")
+        .is(exampleTS)
+        .executeSelect();
   }
 
   @Test
@@ -77,6 +82,31 @@ public class QueryProcessorSelectTest {
                 .prepareStatement("SELECT type FROM Landmark WHERE description = ?");
           }
         });
-    queryProcessor.select("type").from("Landmark").where("description").is(exampleSTR).executeSelect();
+    queryProcessor
+        .select("type")
+        .from("Landmark")
+        .where("description")
+        .is(exampleSTR)
+        .executeSelect();
+  }
+
+  @Test
+  public void selectStatementWithJoinClauseParsedCorrectly() throws SQLException {
+    context.checking(
+        new Expectations() {
+          {
+            exactly(1)
+                .of(mockJDBCconnection)
+                .prepareStatement(
+                    "SELECT * FROM Location JOIN Gallery ON Location.id = Gallery.id");
+          }
+        });
+    queryProcessor
+        .select("*")
+        .from("Location")
+        .join("Gallery")
+        .on("Location.id")
+        .equals("Gallery.id")
+        .executeSelect();
   }
 }
