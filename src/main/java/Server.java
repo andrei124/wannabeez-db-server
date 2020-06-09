@@ -32,12 +32,20 @@ public class Server {
     geoSelectContext.setHandler(this::handleGeoSelect);
   }
 
+  /**
+   * Method for server boot
+   */
   public void start() {
     this.queryProcessor.connect();
     this.httpServer.start();
     System.out.println("Server started");
   }
 
+  /**
+   * Handler for Insert into DB Http Request
+   * @param exchange -- HttpExchange to be processed
+   * @throws IOException
+   */
   private void handleInsert(HttpExchange exchange) throws IOException {
     // extract info from request
     URI requestURI = exchange.getRequestURI();
@@ -115,6 +123,12 @@ public class Server {
     DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
   }
 
+
+  /**
+   * Handler for Select Query from DB Http Request
+   * @param exchange -- HttpExchange to be processed
+   * @throws IOException
+   */
   private void handleSelect(HttpExchange exchange) throws IOException {
     // extract info from request
     URI requestURI = exchange.getRequestURI();
@@ -193,6 +207,12 @@ public class Server {
     DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
   }
 
+
+  /**
+   * Handler for Update a record into DB Http Request
+   * @param exchange -- HttpExchange to be processed
+   * @throws IOException
+   */
   private void handleUpdate(HttpExchange exchange) throws IOException {
     // extract info from request
     URI requestURI = exchange.getRequestURI();
@@ -224,6 +244,12 @@ public class Server {
     DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
   }
 
+
+  /**
+   * Handler for Delete from DB Http Request
+   * @param exchange -- HttpExchange to be processed
+   * @throws IOException
+   */
   private void handleDelete(HttpExchange exchange) throws IOException {
     // extract info from request
     URI requestURI = exchange.getRequestURI();
@@ -262,6 +288,12 @@ public class Server {
     DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
   }
 
+
+  /**
+   * Handler for Geolocation Query from DB Http Request
+   * @param exchange -- HttpExchange to be processed
+   * @throws IOException
+   */
   private void handleGeoSelect(HttpExchange exchange) throws IOException {
     // extract info from request
     URI requestURI = exchange.getRequestURI();
