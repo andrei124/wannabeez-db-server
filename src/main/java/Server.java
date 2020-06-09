@@ -114,6 +114,11 @@ public class Server {
         case "quest":
           {
             System.out.println("quest insertion");
+            this.queryProcessor.addNewQuest(
+                Integer.parseInt(DBInterfaceHelpers.safeMapLookup(params, "type")),
+                DBInterfaceHelpers.safeMapLookup(params, "name"),
+                DBInterfaceHelpers.safeMapLookup(params, "description"));
+            response = DBInterfaceHelpers.SUCCESS;
             break;
           }
         case "quest_location":
