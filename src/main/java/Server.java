@@ -134,6 +134,7 @@ public class Server {
 
       SelectQueryBuilder queryBuilder = queryProcessor.select(columnsToBeQueried).from(table);
 
+      // Check for WHERE clause
       try {
         indexColumn = DBInterfaceHelpers.safeMapLookup(params, "where");
         System.out.println("Select query with WHERE clause requested");
@@ -146,18 +147,22 @@ public class Server {
                 DBInterfaceHelpers.getWhereClause(queryBuilder, params, indexColumn);
       }
 
+      // Check for JOIN clause
       try {
         tableToJoin = DBInterfaceHelpers.safeMapLookup(params, "join");
         joinPresent = true;
+        // Cannot have both JOIN and WHERE clause
+        if(indexColumn != null) {
+          validQuery = false;
+          response = DBInterfaceHelpers.BAD_PARAMS;
+          System.out.println("Query badly written...Cannot have both JOIN and WHERE");
+        }
         System.out.println("Select query with JOIN clause requested");
       } catch (KeyNotFoundException e) {
         System.out.println("No Join query");
       }
-      if(tableToJoin != null) {
+      if(joinPresent && validQuery) {
         queryBuilder = queryBuilder.join(tableToJoin);
-      }
-
-      if(joinPresent) {
         try {
           lhsAttr = DBInterfaceHelpers.safeMapLookup(params, "on");
           rhsAttr = DBInterfaceHelpers.safeMapLookup(params, "equals");
@@ -169,10 +174,9 @@ public class Server {
         }
       }
 
-      // Print the SQL Query
-      System.out.println(queryBuilder.getSQLStatement().toString());
-
       if(validQuery) {
+        // Print the SQL Query
+        System.out.println(queryBuilder.getSQLStatement().toString());
         ResultSet rs = queryBuilder.executeSelect();
         response = DBInterfaceHelpers.SUCCESS;
         response = response + "\n" + DBInterfaceHelpers.getJSONfromResultSet(rs);
