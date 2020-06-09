@@ -3,6 +3,8 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import org.json.JSONException;
 import org.postgis.PGgeometry;
+import org.postgis.PointComposedGeom;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -123,7 +125,10 @@ public class Server {
           }
         case "quest_location":
           {
-            System.out.println("quest_location insertion");
+            this.queryProcessor.addNewQuestLocation(
+                Integer.parseInt(DBInterfaceHelpers.safeMapLookup(params, "questId")),
+                new PGgeometry(DBInterfaceHelpers.safeMapLookup(params, "location")));
+            response = DBInterfaceHelpers.SUCCESS;
             break;
           }
         case "quest_type":
