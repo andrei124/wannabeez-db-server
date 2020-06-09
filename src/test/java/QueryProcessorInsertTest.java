@@ -4,7 +4,6 @@ import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.postgis.PGgeometry;
 import org.postgis.Point;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -111,5 +110,53 @@ public class QueryProcessorInsertTest {
         });
 
     queryProcessor.addNewLandmarkType("Example Landmark Type");
+  }
+
+  @Test
+  public void insertIntoQuestTypeTableParsedCorrectly() throws SQLException {
+
+    context.checking(
+        new Expectations() {
+          {
+            exactly(1)
+                .of(mockJDBCconnection)
+                .prepareStatement("insert into Quest_Type" + " (\"name\") " + " values(?)");
+          }
+        });
+
+    queryProcessor.addNewQuestType("Example Quest Type");
+  }
+
+  @Test
+  public void insertIntoQuestTableParsedCorrectly() throws SQLException {
+
+    context.checking(
+        new Expectations() {
+          {
+            exactly(1)
+                .of(mockJDBCconnection)
+                .prepareStatement(
+                    "insert into Quest"
+                        + " (\"type\", \"name\", \"description\") "
+                        + " values(?, ?, ?)");
+          }
+        });
+
+    queryProcessor.addNewQuest(26, "Example Quest Name", "Sample description");
+  }
+
+  @Test
+  public void insertIntoQuestLocationTableParsedCorrectly() throws SQLException {
+
+    context.checking(
+        new Expectations() {
+          {
+            exactly(1)
+                .of(mockJDBCconnection)
+                .prepareStatement("insert into Quest_Location" + " values(?, ?)");
+          }
+        });
+
+    queryProcessor.addNewQuestLocation(26, examplePG);
   }
 }
