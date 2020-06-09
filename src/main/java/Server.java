@@ -28,8 +28,8 @@ public class Server {
     updateContext.setHandler(this::handleUpdate);
     HttpContext deleteContext = this.httpServer.createContext("/delete");
     deleteContext.setHandler(this::handleDelete);
-    HttpContext spawnContext = this.httpServer.createContext("/spawn");
-    spawnContext.setHandler(this::handleSpawn);
+    HttpContext geoSelectContext = this.httpServer.createContext("/geoSelect");
+    geoSelectContext.setHandler(this::handleGeoSelect);
   }
 
   public void start() {
@@ -225,10 +225,10 @@ public class Server {
     DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
   }
 
-  private void handleSpawn(HttpExchange exchange) throws IOException {
+  private void handleGeoSelect(HttpExchange exchange) throws IOException {
     // extract info from request
     URI requestURI = exchange.getRequestURI();
-    String method = requestURI.getPath().replace("/spawn/", "");
+    String method = requestURI.getPath().replace("/geoSelect/", "");
     Map<String, String> params = DBInterfaceHelpers.parseQuery(requestURI.getQuery());
 
     String response = DBInterfaceHelpers.METHOD_NOT_FOUND;
