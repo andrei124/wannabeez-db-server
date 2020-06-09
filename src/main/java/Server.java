@@ -125,6 +125,7 @@ public class Server {
           }
         case "quest_location":
           {
+            System.out.println("quest_location insertion");
             this.queryProcessor.addNewQuestLocation(
                 Integer.parseInt(DBInterfaceHelpers.safeMapLookup(params, "questId")),
                 new PGgeometry(DBInterfaceHelpers.safeMapLookup(params, "location")));
@@ -134,6 +135,8 @@ public class Server {
         case "quest_type":
           {
             System.out.println("quest_type insertion");
+            this.queryProcessor.addNewQuestType(DBInterfaceHelpers.safeMapLookup(params, "name"));
+            response = DBInterfaceHelpers.SUCCESS;
             break;
           }
       }
