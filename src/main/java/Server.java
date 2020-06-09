@@ -228,24 +228,42 @@ public class Server {
   private void handleSpawn(HttpExchange exchange) throws IOException {
     // extract info from request
     URI requestURI = exchange.getRequestURI();
-    requestURI.getPath().replace("/spawn/", "");
+    String method = requestURI.getPath().replace("/spawn/", "");
     Map<String, String> params = DBInterfaceHelpers.parseQuery(requestURI.getQuery());
 
     String response = DBInterfaceHelpers.METHOD_NOT_FOUND;
     try {
+
       // Geolocation query must contain location parameter, throw exception otherwise
       Double latitude = Double.parseDouble(DBInterfaceHelpers.safeMapLookup(params, "lat"));
       Double longitude = Double.parseDouble(DBInterfaceHelpers.safeMapLookup(params, "lon"));
       Double radius = Double.parseDouble(DBInterfaceHelpers.safeMapLookup(params, "rad"));
 
-      System.out.println("Spawn from DB invoked");
-      SelectQueryBuilder queryBuilder =
-          queryProcessor.select("*").from("Landmark").whereSTContains(latitude, longitude, radius);
+      ResultSet rs = null;
+      SelectQueryBuilder queryBuilder;
 
-      System.out.println(queryBuilder.getSQLStatement().toString());
-      ResultSet rs = queryBuilder.executeSelect();
-      response = DBInterfaceHelpers.SUCCESS;
-      response = response + "\n" + DBInterfaceHelpers.getJSONfromResultSet(rs);
+      switch (method) {
+        case "landmark":
+          System.out.println("try to spawn landmarks");
+          queryBuilder =
+              queryProcessor.select("*").from("landmark")
+                  .withinRadiusOf(latitude, longitude, radius, "landmark", "location");
+          System.out.println(queryBuilder.getSQLStatement().toString());
+          rs = queryBuilder.executeSelect();
+          break;
+        case "quest":
+          System.out.println("try to spawn quests");
+          queryBuilder =
+              queryProcessor.select("*").from("quest").withinRadiusOf(latitude, longitude, radius,
+                  "quest_location", "location");
+          System.out.println(queryBuilder.getSQLStatement().toString());
+          rs = queryBuilder.executeSelect();
+          break;
+      }
+      if (rs != null) {
+        response = DBInterfaceHelpers.SUCCESS;
+        response = response + "\n" + DBInterfaceHelpers.getJSONfromResultSet(rs);
+      }
     } catch (KeyNotFoundException e) {
       // catch missing params
       response = DBInterfaceHelpers.BAD_PARAMS;
