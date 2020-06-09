@@ -88,7 +88,7 @@ public class SelectQueryBuilder implements WhereClauseBuilder {
 
   @Override
   public ResultSet executeSelect() throws SQLException {
-    if (!sqlSelectQuery.toString().contains("WHERE")) {
+    if (stmt == null) {
       stmt = connection.prepareStatement(sqlSelectQuery.toString());
     }
     return DBInterfaceHelpers.getResultSet(stmt);

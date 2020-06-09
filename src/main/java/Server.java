@@ -126,6 +126,13 @@ public class Server {
       String columnsToBeQueried = rawColumns.replace("&", ",");
       String table = DBInterfaceHelpers.safeMapLookup(params, "from");
       String indexColumn = null;
+      String tableToJoin = null;
+      String lhsAttr = null;
+      String rhsAttr = null;
+      boolean validQuery = true;
+      boolean joinPresent = false;
+
+      SelectQueryBuilder queryBuilder = queryProcessor.select(columnsToBeQueried).from(table);
 
       try {
         indexColumn = DBInterfaceHelpers.safeMapLookup(params, "where");
@@ -133,17 +140,43 @@ public class Server {
       } catch (KeyNotFoundException e) {
         System.out.println("Simple Select query requested");
       }
-      SelectQueryBuilder queryBuilder = queryProcessor.select(columnsToBeQueried).from(table);
       if (indexColumn != null) {
         queryBuilder =
             (SelectQueryBuilder)
                 DBInterfaceHelpers.getWhereClause(queryBuilder, params, indexColumn);
       }
 
+      try {
+        tableToJoin = DBInterfaceHelpers.safeMapLookup(params, "join");
+        joinPresent = true;
+        System.out.println("Select query with JOIN clause requested");
+      } catch (KeyNotFoundException e) {
+        System.out.println("No Join query");
+      }
+      if(tableToJoin != null) {
+        queryBuilder = queryBuilder.join(tableToJoin);
+      }
+
+      if(joinPresent) {
+        try {
+          lhsAttr = DBInterfaceHelpers.safeMapLookup(params, "on");
+          rhsAttr = DBInterfaceHelpers.safeMapLookup(params, "equals");
+          queryBuilder = queryBuilder.on(lhsAttr).equals(rhsAttr);
+        } catch (KeyNotFoundException e) {
+          System.out.println("Syntax error in Join query");
+          response = DBInterfaceHelpers.BAD_PARAMS;
+          validQuery = false;
+        }
+      }
+
+      // Print the SQL Query
       System.out.println(queryBuilder.getSQLStatement().toString());
-      ResultSet rs = queryBuilder.executeSelect();
-      response = DBInterfaceHelpers.SUCCESS;
-      response = response + "\n" + DBInterfaceHelpers.getJSONfromResultSet(rs);
+
+      if(validQuery) {
+        ResultSet rs = queryBuilder.executeSelect();
+        response = DBInterfaceHelpers.SUCCESS;
+        response = response + "\n" + DBInterfaceHelpers.getJSONfromResultSet(rs);
+      }
     } catch (KeyNotFoundException e) {
       // catch missing params
       response = DBInterfaceHelpers.BAD_PARAMS;
