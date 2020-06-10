@@ -58,11 +58,12 @@ public class Server {
         case "gallery":
           {
             System.out.println("gallery insertion");
-            this.queryProcessor.addNewImageMetaData(
-                Timestamp.valueOf(DBInterfaceHelpers.safeMapLookup(params, "timestamp")),
-                Integer.parseInt(DBInterfaceHelpers.safeMapLookup(params, "player")),
-                DBInterfaceHelpers.safeMapLookup(params, "url"));
-            response = DBInterfaceHelpers.SUCCESS;
+            Integer imageId =
+                this.queryProcessor.addNewImageMetaData(
+                    Timestamp.valueOf(DBInterfaceHelpers.safeMapLookup(params, "timestamp")),
+                    Integer.parseInt(DBInterfaceHelpers.safeMapLookup(params, "player")),
+                    DBInterfaceHelpers.safeMapLookup(params, "url"));
+            response = imageId.toString();
             break;
           }
         case "player":
@@ -89,7 +90,8 @@ public class Server {
             System.out.println("location insertion");
             this.queryProcessor.addNewLocation(
                 Integer.parseInt(DBInterfaceHelpers.safeMapLookup(params, "image_id")),
-                new PGgeometry(DBInterfaceHelpers.safeMapLookup(params, "location")));
+                Float.parseFloat(DBInterfaceHelpers.safeMapLookup(params, "lat")),
+                Float.parseFloat(DBInterfaceHelpers.safeMapLookup(params, "lon")));
             response = DBInterfaceHelpers.SUCCESS;
             break;
           }
@@ -97,7 +99,8 @@ public class Server {
           {
             System.out.println("landmark insertion");
             this.queryProcessor.addNewLandmark(
-                new PGgeometry(DBInterfaceHelpers.safeMapLookup(params, "location")),
+                Float.parseFloat(DBInterfaceHelpers.safeMapLookup(params, "lat")),
+                Float.parseFloat(DBInterfaceHelpers.safeMapLookup(params, "lon")),
                 Integer.parseInt(DBInterfaceHelpers.safeMapLookup(params, "type")),
                 DBInterfaceHelpers.safeMapLookup(params, "description"));
             response = DBInterfaceHelpers.SUCCESS;
@@ -125,8 +128,9 @@ public class Server {
           {
             System.out.println("quest_location insertion");
             this.queryProcessor.addNewQuestLocation(
-                Integer.parseInt(DBInterfaceHelpers.safeMapLookup(params, "questId")),
-                new PGgeometry(DBInterfaceHelpers.safeMapLookup(params, "location")));
+                Integer.parseInt(DBInterfaceHelpers.safeMapLookup(params, "quest_id")),
+                Float.parseFloat(DBInterfaceHelpers.safeMapLookup(params, "lat")),
+                Float.parseFloat(DBInterfaceHelpers.safeMapLookup(params, "lon")));
             response = DBInterfaceHelpers.SUCCESS;
             break;
           }

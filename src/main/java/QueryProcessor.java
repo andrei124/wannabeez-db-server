@@ -5,6 +5,8 @@ import java.sql.*;
 import java.util.Properties;
 import org.postgis.PGgeometry;
 
+import javax.swing.plaf.nimbus.State;
+
 public class QueryProcessor {
 
   private static final String CONFIG_FILEPATH =
@@ -25,7 +27,7 @@ public class QueryProcessor {
       String driver = properties.getProperty("driver");
       registerDriver(driver);
     } catch (IOException e) {
-      System.out.println("Exception occured when loading the config file");
+      System.out.println("Exception occurred when loading the config file");
       e.printStackTrace();
     }
   }
@@ -118,51 +120,71 @@ public class QueryProcessor {
   }
 
   /** Insert SQL Prepared statement for GALLERY * */
-  public void addNewImageMetaData(Timestamp ts, Integer playerId, String url) throws SQLException {
-    insert("Gallery", ts, playerId, url);
+  public Integer addNewImageMetaData(Timestamp ts, Integer playerId, String url)
+      throws SQLException {
+    return insert("Gallery", ts, playerId, url);
   }
 
-  private void insert(String tableName, Timestamp ts, Integer playerId, String url)
+  private Integer insert(String tableName, Timestamp ts, Integer playerId, String url)
       throws SQLException {
     PreparedStatement stmt =
         connection.prepareStatement(
-            "insert into " + tableName + " (\"ts\", \"player_id\", \"url\") " + " values(?, ?, ?)");
+            "insert into "
+                + tableName
+                + " (\"ts\", \"player_id\", \"url\") "
+                + " values(?, ?, ?) returning id");
     stmt.setTimestamp(1, ts);
     stmt.setInt(2, playerId);
     stmt.setString(3, url);
-    DBInterfaceHelpers.executeSQLStatement(stmt);
+
+    ResultSet id = stmt.executeQuery();
+    id.next();
+    return id.getInt("id");
   }
 
   /** Insert SQL Prepared statement for LOCATION * */
-  public void addNewLocation(Integer imageId, PGgeometry location) throws SQLException {
-    insert("Location", imageId, location);
+  public void addNewLocation(Integer imageId, Float latitude, Float longitude) throws SQLException {
+    insert("Location", imageId, latitude, longitude);
   }
 
-  private void insert(String tableName, Integer imageId, PGgeometry location) throws SQLException {
+  private void insert(String tableName, Integer imageId, Float latitude, Float longitude)
+      throws SQLException {
     PreparedStatement stmt =
-        connection.prepareStatement("insert into " + tableName + " values(?, ?)");
+        connection.prepareStatement(
+            "insert into "
+                + tableName
+                + " values(?, "
+                + "ST_MakePoint("
+                + latitude
+                + ", "
+                + longitude
+                + ")::geography::geometry)");
     stmt.setInt(1, imageId);
-    stmt.setObject(2, location);
     DBInterfaceHelpers.executeSQLStatement(stmt);
   }
 
   /** Insert SQL Prepared statement for LANDMARK * */
-  public void addNewLandmark(PGgeometry location, Integer type, String description)
+  public void addNewLandmark(Float latitude, Float longitude, Integer type, String description)
       throws SQLException {
-    insert("Landmark", location, type, description);
+    insert("Landmark", latitude, longitude, type, description);
   }
 
-  private void insert(String tableName, PGgeometry location, Integer type, String description)
+  private void insert(
+      String tableName, Float latitude, Float longitude, Integer type, String description)
       throws SQLException {
     PreparedStatement stmt =
         connection.prepareStatement(
             "insert into "
                 + tableName
                 + " (\"location\", \"type\", \"description\") "
-                + " values(?, ?, ?)");
-    stmt.setObject(1, location);
-    stmt.setInt(2, type);
-    stmt.setString(3, description);
+                + " values(ST_MakePoint("
+                + latitude
+                + ", "
+                + longitude
+                + ")"
+                + ", ?, ?)");
+    stmt.setInt(1, type);
+    stmt.setString(2, description);
     DBInterfaceHelpers.executeSQLStatement(stmt);
   }
 
@@ -203,8 +225,9 @@ public class QueryProcessor {
   }
 
   /** Insert SQL Prepared Statement for QUEST_LOCATION * */
-  public void addNewQuestLocation(Integer questId, PGgeometry location) throws SQLException {
-    insert("Quest_Location", questId, location);
+  public void addNewQuestLocation(Integer questId, Float latitude, Float longitude)
+      throws SQLException {
+    insert("Quest_Location", questId, latitude, longitude);
   }
 
   /**
