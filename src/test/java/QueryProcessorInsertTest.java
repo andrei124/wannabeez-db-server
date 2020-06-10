@@ -5,7 +5,6 @@ import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.postgis.PGgeometry;
 import org.postgis.Point;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
@@ -73,7 +72,10 @@ public class QueryProcessorInsertTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("insert into Location values(?, ST_MakePoint(42.7, 84.7)::geography::geometry)");
+            exactly(1)
+                .of(mockJDBCconnection)
+                .prepareStatement(
+                    "insert into Location values(?, ST_MakePoint(42.7, 84.7)::geography::geometry)");
           }
         });
 
@@ -95,7 +97,7 @@ public class QueryProcessorInsertTest {
           }
         });
 
-    queryProcessor.addNewLandmark(7.56f,6.12f, 12,"Example Landmark");
+    queryProcessor.addNewLandmark(7.56f, 6.12f, 12, "Example Landmark");
   }
 
   @Test
@@ -154,7 +156,9 @@ public class QueryProcessorInsertTest {
           {
             exactly(1)
                 .of(mockJDBCconnection)
-                .prepareStatement("insert into Quest_Location" + " values(?, ST_MakePoint(65.3, 81.89)::geography::geometry)");
+                .prepareStatement(
+                    "insert into Quest_Location"
+                        + " values(?, ST_MakePoint(65.3, 81.89)::geography::geometry)");
           }
         });
 

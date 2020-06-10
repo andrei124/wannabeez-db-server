@@ -169,14 +169,20 @@ public class QueryProcessor {
     insert("Landmark", latitude, longitude, type, description);
   }
 
-  private void insert(String tableName, Float latitude, Float longitude, Integer type, String description)
+  private void insert(
+      String tableName, Float latitude, Float longitude, Integer type, String description)
       throws SQLException {
     PreparedStatement stmt =
         connection.prepareStatement(
             "insert into "
                 + tableName
                 + " (\"location\", \"type\", \"description\") "
-                + " values(ST_MakePoint(" + latitude + ", " + longitude + ")" + ", ?, ?)");
+                + " values(ST_MakePoint("
+                + latitude
+                + ", "
+                + longitude
+                + ")"
+                + ", ?, ?)");
     stmt.setInt(1, type);
     stmt.setString(2, description);
     DBInterfaceHelpers.executeSQLStatement(stmt);
