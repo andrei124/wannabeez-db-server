@@ -58,11 +58,11 @@ public class Server {
         case "gallery":
           {
             System.out.println("gallery insertion");
-            this.queryProcessor.addNewImageMetaData(
+            Integer imageId = this.queryProcessor.addNewImageMetaData(
                 Timestamp.valueOf(DBInterfaceHelpers.safeMapLookup(params, "timestamp")),
                 Integer.parseInt(DBInterfaceHelpers.safeMapLookup(params, "player")),
                 DBInterfaceHelpers.safeMapLookup(params, "url"));
-            response = DBInterfaceHelpers.SUCCESS;
+            response = DBInterfaceHelpers.SUCCESS + "\nImage id: " + imageId.toString();
             break;
           }
         case "player":

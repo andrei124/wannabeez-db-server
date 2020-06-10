@@ -5,6 +5,7 @@ import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.postgis.PGgeometry;
 import org.postgis.Point;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
@@ -44,7 +45,7 @@ public class QueryProcessorInsertTest {
                 .prepareStatement(
                     "insert into Gallery"
                         + " (\"ts\", \"player_id\", \"url\") "
-                        + " values(?, ?, ?)");
+                        + " values(?, ?, ?) returning id");
           }
         });
 

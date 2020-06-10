@@ -5,6 +5,8 @@ import java.sql.*;
 import java.util.Properties;
 import org.postgis.PGgeometry;
 
+import javax.swing.plaf.nimbus.State;
+
 public class QueryProcessor {
 
   private static final String CONFIG_FILEPATH =
@@ -118,19 +120,26 @@ public class QueryProcessor {
   }
 
   /** Insert SQL Prepared statement for GALLERY * */
-  public void addNewImageMetaData(Timestamp ts, Integer playerId, String url) throws SQLException {
-    insert("Gallery", ts, playerId, url);
+  public Integer addNewImageMetaData(Timestamp ts, Integer playerId, String url)
+      throws SQLException {
+    return insert("Gallery", ts, playerId, url);
   }
 
-  private void insert(String tableName, Timestamp ts, Integer playerId, String url)
+  private Integer insert(String tableName, Timestamp ts, Integer playerId, String url)
       throws SQLException {
     PreparedStatement stmt =
         connection.prepareStatement(
-            "insert into " + tableName + " (\"ts\", \"player_id\", \"url\") " + " values(?, ?, ?)");
+            "insert into "
+                + tableName
+                + " (\"ts\", \"player_id\", \"url\") "
+                + " values(?, ?, ?) returning id");
     stmt.setTimestamp(1, ts);
     stmt.setInt(2, playerId);
     stmt.setString(3, url);
-    DBInterfaceHelpers.executeSQLStatement(stmt);
+
+    ResultSet id = stmt.executeQuery();
+    id.next();
+    return id.getInt("id");
   }
 
   /** Insert SQL Prepared statement for LOCATION * */
