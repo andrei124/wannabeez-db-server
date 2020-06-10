@@ -91,11 +91,11 @@ public class QueryProcessorInsertTest {
                 .prepareStatement(
                     "insert into Landmark"
                         + " (\"location\", \"type\", \"description\") "
-                        + " values(?, ?, ?)");
+                        + " values(ST_MakePoint(7.56, 6.12), ?, ?)");
           }
         });
 
-    queryProcessor.addNewLandmark(examplePG, 6, "Example Landmark");
+    queryProcessor.addNewLandmark(7.56f,6.12f, 12,"Example Landmark");
   }
 
   @Test

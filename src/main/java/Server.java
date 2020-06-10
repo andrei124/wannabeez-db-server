@@ -99,7 +99,8 @@ public class Server {
           {
             System.out.println("landmark insertion");
             this.queryProcessor.addNewLandmark(
-                new PGgeometry(DBInterfaceHelpers.safeMapLookup(params, "location")),
+                Float.parseFloat(DBInterfaceHelpers.safeMapLookup(params, "lat")),
+                Float.parseFloat(DBInterfaceHelpers.safeMapLookup(params, "lon")),
                 Integer.parseInt(DBInterfaceHelpers.safeMapLookup(params, "type")),
                 DBInterfaceHelpers.safeMapLookup(params, "description"));
             response = DBInterfaceHelpers.SUCCESS;

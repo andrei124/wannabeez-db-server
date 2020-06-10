@@ -164,22 +164,21 @@ public class QueryProcessor {
   }
 
   /** Insert SQL Prepared statement for LANDMARK * */
-  public void addNewLandmark(PGgeometry location, Integer type, String description)
+  public void addNewLandmark(Float latitude, Float longitude, Integer type, String description)
       throws SQLException {
-    insert("Landmark", location, type, description);
+    insert("Landmark", latitude, longitude, type, description);
   }
 
-  private void insert(String tableName, PGgeometry location, Integer type, String description)
+  private void insert(String tableName, Float latitude, Float longitude, Integer type, String description)
       throws SQLException {
     PreparedStatement stmt =
         connection.prepareStatement(
             "insert into "
                 + tableName
                 + " (\"location\", \"type\", \"description\") "
-                + " values(?, ?, ?)");
-    stmt.setObject(1, location);
-    stmt.setInt(2, type);
-    stmt.setString(3, description);
+                + " values(ST_MakePoint(" + latitude + ", " + longitude + ")" + ", ?, ?)");
+    stmt.setInt(1, type);
+    stmt.setString(2, description);
     DBInterfaceHelpers.executeSQLStatement(stmt);
   }
 
