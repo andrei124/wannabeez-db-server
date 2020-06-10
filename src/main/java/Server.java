@@ -63,7 +63,7 @@ public class Server {
                     Timestamp.valueOf(DBInterfaceHelpers.safeMapLookup(params, "timestamp")),
                     Integer.parseInt(DBInterfaceHelpers.safeMapLookup(params, "player")),
                     DBInterfaceHelpers.safeMapLookup(params, "url"));
-            response = DBInterfaceHelpers.SUCCESS + "\nImage id: " + imageId.toString();
+            response = imageId.toString();
             break;
           }
         case "player":
