@@ -127,7 +127,7 @@ public class Server {
           {
             System.out.println("quest_location insertion");
             this.queryProcessor.addNewQuestLocation(
-                Integer.parseInt(DBInterfaceHelpers.safeMapLookup(params, "questId")),
+                Integer.parseInt(DBInterfaceHelpers.safeMapLookup(params, "quest_id")),
                 Float.parseFloat(DBInterfaceHelpers.safeMapLookup(params, "lat")),
                 Float.parseFloat(DBInterfaceHelpers.safeMapLookup(params, "lon")));
             response = DBInterfaceHelpers.SUCCESS;
