@@ -27,7 +27,7 @@ public class QueryProcessor {
       String driver = properties.getProperty("driver");
       registerDriver(driver);
     } catch (IOException e) {
-      System.out.println("Exception occured when loading the config file");
+      System.out.println("Exception occurred when loading the config file");
       e.printStackTrace();
     }
   }
@@ -143,15 +143,23 @@ public class QueryProcessor {
   }
 
   /** Insert SQL Prepared statement for LOCATION * */
-  public void addNewLocation(Integer imageId, PGgeometry location) throws SQLException {
-    insert("Location", imageId, location);
+  public void addNewLocation(Integer imageId, Float latitude, Float longitude) throws SQLException {
+    insert("Location", imageId, latitude, longitude);
   }
 
-  private void insert(String tableName, Integer imageId, PGgeometry location) throws SQLException {
+  private void insert(String tableName, Integer imageId, Float latitude, Float longitude)
+      throws SQLException {
     PreparedStatement stmt =
-        connection.prepareStatement("insert into " + tableName + " values(?, ?)");
+        connection.prepareStatement(
+            "insert into "
+                + tableName
+                + " values(?, "
+                + "ST_MakePoint("
+                + latitude
+                + ", "
+                + longitude
+                + ")::geography::geometry)");
     stmt.setInt(1, imageId);
-    stmt.setObject(2, location);
     DBInterfaceHelpers.executeSQLStatement(stmt);
   }
 
@@ -212,8 +220,9 @@ public class QueryProcessor {
   }
 
   /** Insert SQL Prepared Statement for QUEST_LOCATION * */
-  public void addNewQuestLocation(Integer questId, PGgeometry location) throws SQLException {
-    insert("Quest_Location", questId, location);
+  public void addNewQuestLocation(Integer questId, Float latitude, Float longitude)
+      throws SQLException {
+    insert("Quest_Location", questId, latitude, longitude);
   }
 
   /**

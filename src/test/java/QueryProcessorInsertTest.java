@@ -73,11 +73,11 @@ public class QueryProcessorInsertTest {
     context.checking(
         new Expectations() {
           {
-            exactly(1).of(mockJDBCconnection).prepareStatement("insert into Location values(?, ?)");
+            exactly(1).of(mockJDBCconnection).prepareStatement("insert into Location values(?, ST_MakePoint(42.7, 84.7)::geography::geometry)");
           }
         });
 
-    queryProcessor.addNewLocation(1, examplePG);
+    queryProcessor.addNewLocation(1, 42.7f, 84.7f);
   }
 
   @Test
@@ -154,10 +154,10 @@ public class QueryProcessorInsertTest {
           {
             exactly(1)
                 .of(mockJDBCconnection)
-                .prepareStatement("insert into Quest_Location" + " values(?, ?)");
+                .prepareStatement("insert into Quest_Location" + " values(?, ST_MakePoint(65.3, 81.89)::geography::geometry)");
           }
         });
 
-    queryProcessor.addNewQuestLocation(26, examplePG);
+    queryProcessor.addNewQuestLocation(26, 65.3f, 81.89f);
   }
 }
