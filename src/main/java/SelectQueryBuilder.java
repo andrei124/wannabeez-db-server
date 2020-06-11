@@ -23,6 +23,7 @@ public class SelectQueryBuilder implements WhereClauseBuilder {
   @Override
   public SelectQueryBuilder where(String whereParam) throws SQLException {
     sqlSelectQuery.append(" WHERE ").append(whereParam).append(" = ?");
+    System.out.println(sqlSelectQuery.toString());
     stmt = connection.prepareStatement(sqlSelectQuery.toString());
     return this;
   }

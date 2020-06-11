@@ -3,12 +3,12 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Map;
@@ -34,6 +34,8 @@ public class Server {
     geoSelectContext.setHandler(this::handleGeoSelect);
     HttpContext registerContext = this.httpServer.createContext("/register");
     registerContext.setHandler(this::handleRegister);
+    HttpContext authContext = this.httpServer.createContext("/auth");
+    authContext.setHandler(this::handleAuth);
   }
 
   /** Method for server boot */
@@ -382,8 +384,8 @@ public class Server {
     DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
   }
 
-  private void handleRegister(HttpExchange httpExchange) throws IOException {
-    byte[] jsonCredentialsAsBytes = httpExchange.getRequestBody().readAllBytes();
+  private void handleRegister(HttpExchange exchange) throws IOException {
+    byte[] jsonCredentialsAsBytes = exchange.getRequestBody().readAllBytes();
     String credentials = new String(jsonCredentialsAsBytes, StandardCharsets.UTF_8);
 
     JSONObject credentialsAsJSON = new JSONObject(credentials);
@@ -391,18 +393,49 @@ public class Server {
     String password = credentialsAsJSON.getString("password");
 
     String response =
-        DBInterfaceHelpers.SUCCESS
-            + "\n"
-            + "email: "
-            + email
-            + "\n"
-            + "password: "
-            + password;
+        DBInterfaceHelpers.SUCCESS + "\n" + "email: " + email + "\n" + "password: " + password;
     try {
       queryProcessor.addNewPlayer(email, password);
     } catch (SQLException e) {
       response = "Fail...a player with this email already exists";
     }
-    DBInterfaceHelpers.sendResponseBackToClient(httpExchange, response);
+    DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
+  }
+
+  private void handleAuth(HttpExchange exchange) throws IOException {
+    byte[] jsonCredentialsAsBytes = exchange.getRequestBody().readAllBytes();
+    String credentials = new String(jsonCredentialsAsBytes, StandardCharsets.UTF_8);
+    String response;
+
+    JSONObject credentialsAsJSON = new JSONObject(credentials);
+    String email = credentialsAsJSON.getString("email");
+    String password = credentialsAsJSON.getString("password");
+
+    System.out.println(email);
+    System.out.println(password + "\n");
+
+    try {
+      ResultSet rs =
+          queryProcessor.select("*").from("Player").where("email").is(email).executeSelect();
+      if (!rs.next()) {
+        response = "Login failed. A player with this email does not exist...please register first";
+      } else {
+        ResultSetMetaData resultSetMetaData = rs.getMetaData();
+        System.out.println(
+            resultSetMetaData.getColumnName(1)
+                + " "
+                + resultSetMetaData.getColumnName(2)
+                + " "
+                + resultSetMetaData.getColumnName(3));
+        if (!rs.getString("password").equals(password)) {
+          response = "Incorrect password";
+        } else {
+          response = "Login Successful!";
+        }
+      }
+    } catch (SQLException e) {
+      response = "Database error occurred...Login Failed";
+    }
+    DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
   }
 }
