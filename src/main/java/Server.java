@@ -1,13 +1,19 @@
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
+import org.postgis.Point;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class Server {
@@ -331,16 +337,17 @@ public class Server {
     String response = DBInterfaceHelpers.METHOD_NOT_FOUND;
     try {
 
-      // Geolocation query must contain location parameter, throw exception otherwise
-      Double latitude = Double.parseDouble(DBInterfaceHelpers.safeMapLookup(params, "lat"));
-      Double longitude = Double.parseDouble(DBInterfaceHelpers.safeMapLookup(params, "lon"));
-      Double radius = Double.parseDouble(DBInterfaceHelpers.safeMapLookup(params, "rad"));
-
       ResultSet rs = null;
       SelectQueryBuilder queryBuilder;
+      Double latitude;
+      Double longitude;
+      Double radius;
 
       switch (method) {
         case "landmark":
+          latitude = Double.parseDouble(DBInterfaceHelpers.safeMapLookup(params, "lat"));
+          longitude = Double.parseDouble(DBInterfaceHelpers.safeMapLookup(params, "lon"));
+          radius = Double.parseDouble(DBInterfaceHelpers.safeMapLookup(params, "rad"));
           System.out.println("try to spawn landmarks");
           queryBuilder =
               queryProcessor
@@ -351,12 +358,42 @@ public class Server {
           rs = queryBuilder.executeSelect();
           break;
         case "quest":
+          latitude = Double.parseDouble(DBInterfaceHelpers.safeMapLookup(params, "lat"));
+          longitude = Double.parseDouble(DBInterfaceHelpers.safeMapLookup(params, "lon"));
+          radius = Double.parseDouble(DBInterfaceHelpers.safeMapLookup(params, "rad"));
           System.out.println("try to spawn quests");
           queryBuilder =
               queryProcessor
                   .select("*")
                   .from("quest")
                   .withinRadiusOf(latitude, longitude, radius, "quest_location", "location");
+          System.out.println(queryBuilder.getSQLStatement().toString());
+          rs = queryBuilder.executeSelect();
+          break;
+        case "location":
+          System.out.println("find image locations");
+          /* Sample Poly JSON:
+          [{"lat":52.43042541356032,"lng":-4.966549702756713},{"lat":46.741212852594806,"lng":-9.119381734006712},
+          {"lat":44.73252738390248,"lng":16.588626078493288},{"lat":56.77788943094397,"lng":7.118411234743287},
+          {"lat":57.37500227162194,"lng":-21.709713765256712}]
+           */
+          // Parse poly from json
+          JSONArray vertsJSON = new JSONArray(DBInterfaceHelpers.safeMapLookup(params, "poly"));
+          List<Point> vertices = new ArrayList<>();
+          // Check there are enough verts
+          if (vertsJSON.length() < 3)
+            throw new KeyNotFoundException();
+          // Populate verts
+          for (int i = 0; i < vertsJSON.length(); i++) {
+            JSONObject v = new JSONObject(vertsJSON.get(i).toString());
+            vertices.add(new Point(v.getDouble("lng"), v.getDouble("lat")));
+          }
+          // Send query
+          queryBuilder =
+              queryProcessor
+                  .select("*")
+                  .from("location")
+                  .withinPoly(vertices, "location", "location");
           System.out.println(queryBuilder.getSQLStatement().toString());
           rs = queryBuilder.executeSelect();
           break;

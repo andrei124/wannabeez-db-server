@@ -1,5 +1,8 @@
 import org.postgis.PGgeometry;
+import org.postgis.Point;
+
 import java.sql.*;
+import java.util.List;
 
 public class SelectQueryBuilder implements WhereClauseBuilder {
 
@@ -39,6 +42,36 @@ public class SelectQueryBuilder implements WhereClauseBuilder {
         .append("::geography, ")
         .append(radius)
         .append(")::geometry, ")
+        .append(table)
+        .append(".")
+        .append(column)
+        .append(")");
+    stmt = connection.prepareStatement(sqlSelectQuery.toString());
+    return this;
+  }
+
+  public SelectQueryBuilder withinPoly
+      (List<Point> vertices, String table, String column) throws SQLException {
+    // TODO: maybe validate that |vertices| > 2
+    sqlSelectQuery
+        .append(" WHERE ")
+        .append("ST_Contains(ST_SetSRID(ST_GEOMFROMTEXT('POLYGON((");
+    // Add points
+    for (Point v : vertices) {
+      sqlSelectQuery
+          .append(v.x)
+          .append(" ")
+          .append(v.y)
+          .append(", ");
+    }
+    // Close the loop
+    sqlSelectQuery
+        .append(vertices.get(0).x)
+        .append(" ")
+        .append(vertices.get(0).y);
+    // Finish off the statement
+    sqlSelectQuery
+        .append("))'),4326),")
         .append(table)
         .append(".")
         .append(column)
