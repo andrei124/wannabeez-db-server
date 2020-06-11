@@ -26,7 +26,7 @@ public class QueryProcessorInsertTest {
             exactly(1)
                 .of(mockJDBCconnection)
                 .prepareStatement(
-                    "insert into Player" + " (\"email\", \"password\") " + " values(?, ?)");
+                    "insert into Player" + " (\"email\", \"password\") " + " values(?, ?) returning id");
           }
         });
 
