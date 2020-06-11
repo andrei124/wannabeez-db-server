@@ -87,6 +87,7 @@ public class QueryProcessor {
    * of values to be inserted into DB Each overloaded method is designed for a specific table
    *
    * <p>Insert SQL Prepared statement for PLAYER *
+   *
    * @return Integer -- the id of the new player that was just added
    */
   public Integer addNewPlayer(String email, String password) throws SQLException {
@@ -96,7 +97,10 @@ public class QueryProcessor {
   private Integer insert(String tableName, String email, String password) throws SQLException {
     PreparedStatement stmt =
         connection.prepareStatement(
-            "insert into " + tableName + " (\"email\", \"password\") " + " values(?, ?) returning id");
+            "insert into "
+                + tableName
+                + " (\"email\", \"password\") "
+                + " values(?, ?) returning id");
     stmt.setString(1, email);
     stmt.setString(2, password);
 

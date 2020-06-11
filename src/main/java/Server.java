@@ -14,12 +14,6 @@ import java.util.Map;
 
 public class Server {
 
-  private static final String LOGIN_SUCCESSFUL = "200";
-  private static final String WRONG_CREDENTIALS = "401";
-  private static final String DB_ERROR = "500";
-  private static final Integer DEFAULT_XP = 0;
-  private static final Integer DEFAULT_CASH = 100;
-
   private final QueryProcessor queryProcessor;
   private final HttpServer httpServer;
 
@@ -397,13 +391,14 @@ public class Server {
     String email = credentialsAsJSON.getString("email");
     String password = credentialsAsJSON.getString("password");
 
-    String response = LOGIN_SUCCESSFUL;
+    String response = DBInterfaceHelpers.LOGIN_SUCCESSFUL;
     try {
-     Integer playerId = queryProcessor.addNewPlayer(email, password);
-     queryProcessor.addPlayerStats(playerId, DEFAULT_XP, DEFAULT_CASH);
+      Integer playerId = queryProcessor.addNewPlayer(email, password);
+      queryProcessor.addPlayerStats(
+          playerId, DBInterfaceHelpers.DEFAULT_XP, DBInterfaceHelpers.DEFAULT_CASH);
     } catch (SQLException e) {
       System.out.println("Fail...a player with this email already exists");
-      response = WRONG_CREDENTIALS;
+      response = DBInterfaceHelpers.WRONG_CREDENTIALS;
     }
     System.out.println("Register succsesful");
     DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
@@ -422,16 +417,16 @@ public class Server {
       ResultSet rs =
           queryProcessor.select("*").from("Player").where("email").is(email).executeSelect();
       if (!rs.next()) {
-        response = WRONG_CREDENTIALS;
+        response = DBInterfaceHelpers.WRONG_CREDENTIALS;
       } else {
         if (!rs.getString("password").equals(password)) {
-          response = WRONG_CREDENTIALS;
+          response = DBInterfaceHelpers.WRONG_CREDENTIALS;
         } else {
-          response = LOGIN_SUCCESSFUL;
+          response = DBInterfaceHelpers.LOGIN_SUCCESSFUL;
         }
       }
     } catch (SQLException e) {
-      response = DB_ERROR;
+      response = DBInterfaceHelpers.DB_ERROR;
     }
     System.out.println("Auth successful");
     DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
