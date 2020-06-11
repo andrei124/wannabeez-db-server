@@ -32,9 +32,9 @@ public class SelectQueryBuilder implements WhereClauseBuilder {
     sqlSelectQuery
         .append(" WHERE ")
         .append("ST_Contains(ST_Buffer(ST_MakePoint(")
-        .append(x)
-        .append(", ")
         .append(y)
+        .append(", ")
+        .append(x)
         .append(")")
         .append("::geography, ")
         .append(radius)
