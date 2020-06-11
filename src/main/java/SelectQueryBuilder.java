@@ -19,7 +19,7 @@ public class SelectQueryBuilder implements WhereClauseBuilder {
   }
 
   public SelectQueryBuilder from(String table) {
-    sqlSelectQuery.append(" FROM ").append(table);
+    sqlSelectQuery.append("FROM ").append(table);
     return this;
   }
 
