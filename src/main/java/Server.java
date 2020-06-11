@@ -8,12 +8,15 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Map;
 
 public class Server {
+
+  private static final String LOGIN_SUCCESSFUL = "200";
+  private static final String WRONG_CREDENTIALS = "401";
+  private static final String DB_ERROR = "500";
 
   private final QueryProcessor queryProcessor;
   private final HttpServer httpServer;
@@ -392,12 +395,14 @@ public class Server {
     String email = credentialsAsJSON.getString("email");
     String password = credentialsAsJSON.getString("password");
 
-    String response = DBInterfaceHelpers.SUCCESS;
+    String response = LOGIN_SUCCESSFUL;
     try {
       queryProcessor.addNewPlayer(email, password);
     } catch (SQLException e) {
-      response = "Fail...a player with this email already exists";
+      System.out.println("Fail...a player with this email already exists");
+      response = WRONG_CREDENTIALS;
     }
+    System.out.println("Register succsesful");
     DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
   }
 
@@ -414,18 +419,18 @@ public class Server {
       ResultSet rs =
           queryProcessor.select("*").from("Player").where("email").is(email).executeSelect();
       if (!rs.next()) {
-        response = "Login failed. A player with this email does not exist...please register first";
+        response = WRONG_CREDENTIALS;
       } else {
-        ResultSetMetaData resultSetMetaData = rs.getMetaData();
         if (!rs.getString("password").equals(password)) {
-          response = "Incorrect password";
+          response = WRONG_CREDENTIALS;
         } else {
-          response = "Login Successful!";
+          response = LOGIN_SUCCESSFUL;
         }
       }
     } catch (SQLException e) {
-      response = "Database error occurred...Login Failed";
+      response = DB_ERROR;
     }
+    System.out.println("Auth successful");
     DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
   }
 }
