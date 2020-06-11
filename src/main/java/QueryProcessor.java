@@ -3,9 +3,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
 import java.util.Properties;
-import org.postgis.PGgeometry;
-
-import javax.swing.plaf.nimbus.State;
 
 public class QueryProcessor {
 
@@ -143,11 +140,11 @@ public class QueryProcessor {
   }
 
   /** Insert SQL Prepared statement for LOCATION * */
-  public void addNewLocation(Integer imageId, Float latitude, Float longitude) throws SQLException {
-    insert("Location", imageId, latitude, longitude);
+  public void addNewLocation(Integer imageId, Float longitude, Float latitude) throws SQLException {
+    insert("Location", imageId, longitude, latitude);
   }
 
-  private void insert(String tableName, Integer imageId, Float latitude, Float longitude)
+  private void insert(String tableName, Integer imageId, Float longitude, Float latitude)
       throws SQLException {
     PreparedStatement stmt =
         connection.prepareStatement(
@@ -164,13 +161,13 @@ public class QueryProcessor {
   }
 
   /** Insert SQL Prepared statement for LANDMARK * */
-  public void addNewLandmark(Float latitude, Float longitude, Integer type, String description)
+  public void addNewLandmark(Float longitude, Float latitude, Integer type, String description)
       throws SQLException {
-    insert("Landmark", latitude, longitude, type, description);
+    insert("Landmark", longitude, latitude, type, description);
   }
 
   private void insert(
-      String tableName, Float latitude, Float longitude, Integer type, String description)
+      String tableName, Float longitude, Float latitude, Integer type, String description)
       throws SQLException {
     PreparedStatement stmt =
         connection.prepareStatement(
@@ -225,9 +222,9 @@ public class QueryProcessor {
   }
 
   /** Insert SQL Prepared Statement for QUEST_LOCATION * */
-  public void addNewQuestLocation(Integer questId, Float latitude, Float longitude)
+  public void addNewQuestLocation(Integer questId, Float longitude, Float latitude)
       throws SQLException {
-    insert("Quest_Location", questId, latitude, longitude);
+    insert("Quest_Location", questId, longitude, latitude);
   }
 
   /**

@@ -89,8 +89,8 @@ public class Server {
             System.out.println("location insertion");
             this.queryProcessor.addNewLocation(
                 Integer.parseInt(DBInterfaceHelpers.safeMapLookup(params, "image_id")),
-                Float.parseFloat(DBInterfaceHelpers.safeMapLookup(params, "lat")),
-                Float.parseFloat(DBInterfaceHelpers.safeMapLookup(params, "lon")));
+                Float.parseFloat(DBInterfaceHelpers.safeMapLookup(params, "lon")),
+                Float.parseFloat(DBInterfaceHelpers.safeMapLookup(params, "lat")));
             response = DBInterfaceHelpers.SUCCESS;
             break;
           }
@@ -98,8 +98,8 @@ public class Server {
           {
             System.out.println("landmark insertion");
             this.queryProcessor.addNewLandmark(
-                Float.parseFloat(DBInterfaceHelpers.safeMapLookup(params, "lat")),
                 Float.parseFloat(DBInterfaceHelpers.safeMapLookup(params, "lon")),
+                Float.parseFloat(DBInterfaceHelpers.safeMapLookup(params, "lat")),
                 Integer.parseInt(DBInterfaceHelpers.safeMapLookup(params, "type")),
                 DBInterfaceHelpers.safeMapLookup(params, "description"));
             response = DBInterfaceHelpers.SUCCESS;
@@ -128,8 +128,8 @@ public class Server {
             System.out.println("quest_location insertion");
             this.queryProcessor.addNewQuestLocation(
                 Integer.parseInt(DBInterfaceHelpers.safeMapLookup(params, "quest_id")),
-                Float.parseFloat(DBInterfaceHelpers.safeMapLookup(params, "lat")),
-                Float.parseFloat(DBInterfaceHelpers.safeMapLookup(params, "lon")));
+                Float.parseFloat(DBInterfaceHelpers.safeMapLookup(params, "lon")),
+                Float.parseFloat(DBInterfaceHelpers.safeMapLookup(params, "lat")));
             response = DBInterfaceHelpers.SUCCESS;
             break;
           }
