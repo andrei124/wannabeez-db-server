@@ -9,6 +9,7 @@ import org.postgis.Point;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -35,6 +36,10 @@ public class Server {
     deleteContext.setHandler(this::handleDelete);
     HttpContext geoSelectContext = this.httpServer.createContext("/geoSelect");
     geoSelectContext.setHandler(this::handleGeoSelect);
+    HttpContext registerContext = this.httpServer.createContext("/register");
+    registerContext.setHandler(this::handleRegister);
+    HttpContext authContext = this.httpServer.createContext("/auth");
+    authContext.setHandler(this::handleAuth);
   }
 
   /** Method for server boot */
@@ -427,6 +432,55 @@ public class Server {
       response += "\nCould not retrieve JSON Object...Exception caught...";
     }
     // send response
+    DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
+  }
+
+  private void handleRegister(HttpExchange exchange) throws IOException {
+    byte[] jsonCredentialsAsBytes = exchange.getRequestBody().readAllBytes();
+    String credentials = new String(jsonCredentialsAsBytes, StandardCharsets.UTF_8);
+
+    JSONObject credentialsAsJSON = new JSONObject(credentials);
+    String email = credentialsAsJSON.getString("email");
+    String password = credentialsAsJSON.getString("password");
+
+    String response = DBInterfaceHelpers.LOGIN_SUCCESSFUL;
+    try {
+      Integer playerId = queryProcessor.addNewPlayer(email, password);
+      queryProcessor.addPlayerStats(
+          playerId, DBInterfaceHelpers.DEFAULT_XP, DBInterfaceHelpers.DEFAULT_CASH);
+    } catch (SQLException e) {
+      System.out.println("Fail...a player with this email already exists");
+      response = DBInterfaceHelpers.WRONG_CREDENTIALS;
+    }
+    System.out.println("Register succsesful");
+    DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
+  }
+
+  private void handleAuth(HttpExchange exchange) throws IOException {
+    byte[] jsonCredentialsAsBytes = exchange.getRequestBody().readAllBytes();
+    String credentials = new String(jsonCredentialsAsBytes, StandardCharsets.UTF_8);
+    String response;
+
+    JSONObject credentialsAsJSON = new JSONObject(credentials);
+    String email = credentialsAsJSON.getString("email");
+    String password = credentialsAsJSON.getString("password");
+
+    try {
+      ResultSet rs =
+          queryProcessor.select("*").from("Player").where("email").is(email).executeSelect();
+      if (!rs.next()) {
+        response = DBInterfaceHelpers.WRONG_CREDENTIALS;
+      } else {
+        if (!rs.getString("password").equals(password)) {
+          response = DBInterfaceHelpers.WRONG_CREDENTIALS;
+        } else {
+          response = DBInterfaceHelpers.LOGIN_SUCCESSFUL;
+        }
+      }
+    } catch (SQLException e) {
+      response = DBInterfaceHelpers.DB_ERROR;
+    }
+    System.out.println("Auth successful");
     DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
   }
 }

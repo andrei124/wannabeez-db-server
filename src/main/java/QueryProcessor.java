@@ -87,18 +87,26 @@ public class QueryProcessor {
    * of values to be inserted into DB Each overloaded method is designed for a specific table
    *
    * <p>Insert SQL Prepared statement for PLAYER *
+   *
+   * @return Integer -- the id of the new player that was just added
    */
-  public void addNewPlayer(String email, String password) throws SQLException {
-    insert("Player", email, password);
+  public Integer addNewPlayer(String email, String password) throws SQLException {
+    return insert("Player", email, password);
   }
 
-  private void insert(String tableName, String email, String password) throws SQLException {
+  private Integer insert(String tableName, String email, String password) throws SQLException {
     PreparedStatement stmt =
         connection.prepareStatement(
-            "insert into " + tableName + " (\"email\", \"password\") " + " values(?, ?)");
+            "insert into "
+                + tableName
+                + " (\"email\", \"password\") "
+                + " values(?, ?) returning id");
     stmt.setString(1, email);
     stmt.setString(2, password);
-    DBInterfaceHelpers.executeSQLStatement(stmt);
+
+    ResultSet id = stmt.executeQuery();
+    id.next();
+    return id.getInt("id");
   }
 
   /** Insert SQL Prepared statement for PLAYER_STATS * */
