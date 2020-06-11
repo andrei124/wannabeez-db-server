@@ -19,7 +19,12 @@ public class SelectQueryBuilder implements WhereClauseBuilder {
   }
 
   public SelectQueryBuilder from(String table) {
-    sqlSelectQuery.append("FROM ").append(table);
+    sqlSelectQuery.append(" FROM ").append(table);
+    return this;
+  }
+
+  public SelectQueryBuilder as(String table) {
+    sqlSelectQuery.append(" AS ").append(table);
     return this;
   }
 
@@ -106,6 +111,11 @@ public class SelectQueryBuilder implements WhereClauseBuilder {
 
   public SelectQueryBuilder join(String table) {
     sqlSelectQuery.append(" JOIN ").append(table);
+    return this;
+  }
+
+  public SelectQueryBuilder innerJoin(String table) {
+    sqlSelectQuery.append(" INNER JOIN ").append(table);
     return this;
   }
 

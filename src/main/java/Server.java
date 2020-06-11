@@ -388,14 +388,28 @@ public class Server {
             JSONObject v = new JSONObject(vertsJSON.get(i).toString());
             vertices.add(new Point(v.getDouble("lng"), v.getDouble("lat")));
           }
-          // Send query
+          // Send
+          SelectQueryBuilder innerSubQueryBuilder =
+              queryProcessor
+              .select("*")
+              .from("location")
+              .withinPoly(vertices, "location", "location");
+
+          SelectQueryBuilder outerSubQueryBuilder =
+              queryProcessor
+                  .select("t1.id, t1.location, url")
+                  .from("(" + innerSubQueryBuilder.getSQLStatement().toString() + ") t1")
+                  .innerJoin("gallery")
+                  .on("gallery.id = t1.id");
+
           queryBuilder =
               queryProcessor
                   .select("id, " +
                       "ST_X(ST_Centroid(ST_Transform(location, 4326))) AS long, " +
-                      "ST_Y(ST_Centroid(ST_Transform(location, 4326))) AS lat")
-                  .from("location")
-                  .withinPoly(vertices, "location", "location");
+                      "ST_Y(ST_Centroid(ST_Transform(location, 4326))) AS lat, " +
+                      "url")
+                  .from("(" + outerSubQueryBuilder.getSQLStatement().toString() + ") t2");
+
           System.out.println(queryBuilder.getSQLStatement().toString());
           rs = queryBuilder.executeSelect();
           break;
