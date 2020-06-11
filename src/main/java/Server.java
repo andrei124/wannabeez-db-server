@@ -391,7 +391,9 @@ public class Server {
           // Send query
           queryBuilder =
               queryProcessor
-                  .select("*")
+                  .select("id, " +
+                      "ST_X(ST_Centroid(ST_Transform(location, 4326))) AS long, " +
+                      "ST_Y(ST_Centroid(ST_Transform(location, 4326))) AS lat")
                   .from("location")
                   .withinPoly(vertices, "location", "location");
           System.out.println(queryBuilder.getSQLStatement().toString());
