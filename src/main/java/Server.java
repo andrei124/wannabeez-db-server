@@ -17,6 +17,8 @@ public class Server {
   private static final String LOGIN_SUCCESSFUL = "200";
   private static final String WRONG_CREDENTIALS = "401";
   private static final String DB_ERROR = "500";
+  private static final Integer DEFAULT_XP = 0;
+  private static final Integer DEFAULT_CASH = 100;
 
   private final QueryProcessor queryProcessor;
   private final HttpServer httpServer;
@@ -397,7 +399,8 @@ public class Server {
 
     String response = LOGIN_SUCCESSFUL;
     try {
-      queryProcessor.addNewPlayer(email, password);
+     Integer playerId = queryProcessor.addNewPlayer(email, password);
+     queryProcessor.addPlayerStats(playerId, DEFAULT_XP, DEFAULT_CASH);
     } catch (SQLException e) {
       System.out.println("Fail...a player with this email already exists");
       response = WRONG_CREDENTIALS;
