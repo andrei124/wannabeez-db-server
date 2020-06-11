@@ -2,9 +2,12 @@ import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -29,6 +32,8 @@ public class Server {
     deleteContext.setHandler(this::handleDelete);
     HttpContext geoSelectContext = this.httpServer.createContext("/geoSelect");
     geoSelectContext.setHandler(this::handleGeoSelect);
+    HttpContext registerContext = this.httpServer.createContext("/register");
+    registerContext.setHandler(this::handleRegister);
   }
 
   /** Method for server boot */
@@ -375,5 +380,29 @@ public class Server {
     }
     // send response
     DBInterfaceHelpers.sendResponseBackToClient(exchange, response);
+  }
+
+  private void handleRegister(HttpExchange httpExchange) throws IOException {
+    byte[] jsonCredentialsAsBytes = httpExchange.getRequestBody().readAllBytes();
+    String credentials = new String(jsonCredentialsAsBytes, StandardCharsets.UTF_8);
+
+    JSONObject credentialsAsJSON = new JSONObject(credentials);
+    String email = credentialsAsJSON.getString("email");
+    String password = credentialsAsJSON.getString("password");
+
+    String response =
+        DBInterfaceHelpers.SUCCESS
+            + "\n"
+            + "email: "
+            + email
+            + "\n"
+            + "password: "
+            + password;
+    try {
+      queryProcessor.addNewPlayer(email, password);
+    } catch (SQLException e) {
+      response = "Fail...a player with this email already exists";
+    }
+    DBInterfaceHelpers.sendResponseBackToClient(httpExchange, response);
   }
 }
