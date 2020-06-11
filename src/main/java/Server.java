@@ -392,8 +392,7 @@ public class Server {
     String email = credentialsAsJSON.getString("email");
     String password = credentialsAsJSON.getString("password");
 
-    String response =
-        DBInterfaceHelpers.SUCCESS + "\n" + "email: " + email + "\n" + "password: " + password;
+    String response = DBInterfaceHelpers.SUCCESS;
     try {
       queryProcessor.addNewPlayer(email, password);
     } catch (SQLException e) {
@@ -411,9 +410,6 @@ public class Server {
     String email = credentialsAsJSON.getString("email");
     String password = credentialsAsJSON.getString("password");
 
-    System.out.println(email);
-    System.out.println(password + "\n");
-
     try {
       ResultSet rs =
           queryProcessor.select("*").from("Player").where("email").is(email).executeSelect();
@@ -421,12 +417,6 @@ public class Server {
         response = "Login failed. A player with this email does not exist...please register first";
       } else {
         ResultSetMetaData resultSetMetaData = rs.getMetaData();
-        System.out.println(
-            resultSetMetaData.getColumnName(1)
-                + " "
-                + resultSetMetaData.getColumnName(2)
-                + " "
-                + resultSetMetaData.getColumnName(3));
         if (!rs.getString("password").equals(password)) {
           response = "Incorrect password";
         } else {
