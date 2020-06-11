@@ -19,7 +19,7 @@ public class DBInterfaceHelpers {
   public static final String WRONG_CREDENTIALS = "401";
   public static final String DB_ERROR = "500";
   public static final Integer DEFAULT_XP = 0;
-  public static final Integer DEFAULT_CASH = 100;
+  public static final Integer DEFAULT_CASH = 0;
 
   /**
    * Helper method for executing an SQL Prepared Statement
