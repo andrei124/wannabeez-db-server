@@ -154,11 +154,11 @@ public class QueryProcessor {
             "insert into "
                 + tableName
                 + " values(?, "
-                + "ST_MakePoint("
-                + latitude
-                + ", "
+                + "ST_SetSRID(ST_MakePoint("
                 + longitude
-                + ")::geography::geometry)");
+                + ", "
+                + latitude
+                + "), 4326)::geography::geometry)");
     stmt.setInt(1, imageId);
     DBInterfaceHelpers.executeSQLStatement(stmt);
   }
@@ -177,11 +177,11 @@ public class QueryProcessor {
             "insert into "
                 + tableName
                 + " (\"location\", \"type\", \"description\") "
-                + " values(ST_MakePoint("
-                + latitude
-                + ", "
+                + "values(ST_SetSRID(ST_MakePoint("
                 + longitude
-                + ")"
+                + ", "
+                + latitude
+                + "),4326)"
                 + ", ?, ?)");
     stmt.setInt(1, type);
     stmt.setString(2, description);

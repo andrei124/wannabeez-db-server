@@ -2,7 +2,6 @@ import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import org.json.JSONException;
-import org.postgis.PGgeometry;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
