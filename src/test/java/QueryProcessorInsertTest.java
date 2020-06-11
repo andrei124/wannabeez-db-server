@@ -75,11 +75,11 @@ public class QueryProcessorInsertTest {
             exactly(1)
                 .of(mockJDBCconnection)
                 .prepareStatement(
-                    "insert into Location values(?, ST_MakePoint(42.7, 84.7)::geography::geometry)");
+                    "insert into Location values(?, ST_SetSRID(ST_MakePoint(84.7, 42.7), 4326)::geography::geometry)");
           }
         });
 
-    queryProcessor.addNewLocation(1, 42.7f, 84.7f);
+    queryProcessor.addNewLocation(1, 84.7f, 42.7f);
   }
 
   @Test
@@ -93,11 +93,11 @@ public class QueryProcessorInsertTest {
                 .prepareStatement(
                     "insert into Landmark"
                         + " (\"location\", \"type\", \"description\") "
-                        + " values(ST_MakePoint(7.56, 6.12), ?, ?)");
+                        + "values(ST_SetSRID(ST_MakePoint(6.12, 7.56),4326), ?, ?)");
           }
         });
 
-    queryProcessor.addNewLandmark(7.56f, 6.12f, 12, "Example Landmark");
+    queryProcessor.addNewLandmark(6.12f, 7.56f, 12, "Example Landmark");
   }
 
   @Test
@@ -158,10 +158,10 @@ public class QueryProcessorInsertTest {
                 .of(mockJDBCconnection)
                 .prepareStatement(
                     "insert into Quest_Location"
-                        + " values(?, ST_MakePoint(65.3, 81.89)::geography::geometry)");
+                        + " values(?, ST_SetSRID(ST_MakePoint(81.89, 65.3), 4326)::geography::geometry)");
           }
         });
 
-    queryProcessor.addNewQuestLocation(26, 65.3f, 81.89f);
+    queryProcessor.addNewQuestLocation(26, 81.89f, 65.3f);
   }
 }
