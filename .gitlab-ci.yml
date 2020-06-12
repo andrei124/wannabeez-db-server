@@ -17,10 +17,9 @@ deploy:
     - production
   script:
     - cp ~/config.properties ./
-    - export running=$(docker ps -a |grep dbi |awk '{print $1}')
-    - if [ ! -z "$running" ]; then docker stop $running; fi
-    - if [ ! -z "$running" ]; then docker rm $running; fi
+    - export running=$(docker service ls |grep dbi |awk '{print $1}')
+    - if [ ! -z "$running" ]; then docker service rm $running; fi
     - docker build --tag dbi .
-    - docker run -d -p 42069:8500 dbi
+    - docker service create -p 42069:8500 --replicas 5 dbi
   only:
     - master
