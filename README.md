@@ -1,5 +1,5 @@
-# Datablazeit
+# Wannabeez App DB Interface
 
-Database interface
+PostgreSQL API Gateway 
 
 NB: current CI pipeline on Azure is being run in a tmux session.
